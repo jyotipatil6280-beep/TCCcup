@@ -30,7 +30,7 @@ export default function HomePage() {
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <div className="bg-gradient-to-r from-red-600 to-orange-600 text-white font-bold py-4 px-8 rounded-2xl text-lg shadow-lg">
+            <div className="bg-gradient-to-r from-red-600 to-orange-600 text-white font-bold rounded-2xl text-lg shadow-lg px-2 py-1">
               <Trophy className="w-5 h-5 mr-2 inline" />
               Registration Closed
             </div>
