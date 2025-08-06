@@ -167,7 +167,7 @@ export default function TeamsPage() {
                             </div>
                           ))}
                       </div>
-                      <div className="pt-2 border-t border-gray-600">
+                      <div className="pt-2 border-t border-transparent">
                         <p className="text-xs text-gray-400">
                           Registered: {new Date(team.created_at).toLocaleDateString()}
                         </p>

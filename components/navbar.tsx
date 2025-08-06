@@ -19,14 +19,14 @@ export default function Navbar() {
   const pathname = usePathname()
 
   return (
-    <nav className="bg-gradient-to-r from-blue-900/95 to-teal-900/95 backdrop-blur-sm border-b border-gray-700 sticky top-0 z-50">
+    <nav className="bg-gradient-to-r from-blue-900/95 to-teal-900/95 backdrop-blur-sm border-b sticky top-0 z-50 border-transparent">
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <Link href="/" className="flex items-center space-x-3">
             <img src="https://i.ibb.co/jkVCpXPv/TCC-LOGO.png" alt="TCC Logo" className="h-10 w-10 object-contain" />
             <div className="text-white">
-              <div className="font-bold text-lg">{"TCC | UGC"}</div>
+              <div className="text-lg font-extrabold tracking-wide text-cyan-300">{"TCC | UGC"}</div>
             </div>
           </Link>
 

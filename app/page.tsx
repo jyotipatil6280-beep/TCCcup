@@ -51,7 +51,7 @@ export default function HomePage() {
       {/* Features Section */}
       <section className="py-16 px-4">
         <div className="container mx-auto">
-          <h2 className="text-3xl md:text-4xl font-bold text-center text-white mb-12">Tournament Highlights</h2>
+          <h2 className="text-3xl md:text-4xl font-bold text-center mb-12 text-white">Tournament Highlights</h2>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
             <Card className="bg-gradient-to-br from-blue-800/50 to-teal-800/50 border border-cyan-500/30 rounded-2xl">

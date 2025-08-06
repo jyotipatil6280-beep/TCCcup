@@ -1,7 +1,7 @@
 export default function Footer() {
   return (
     <footer className="bg-gradient-to-r from-blue-900/95 to-teal-900/95 border-t border-gray-700 mt-auto">
-      <div className="container mx-auto px-4 py-8">
+      <div className="container mx-auto px-4 py-8 border-transparent">
         <div className="grid md:grid-cols-3 gap-8">
           {/* Logo and Description */}
           <div className="space-y-4">
@@ -46,7 +46,7 @@ export default function Footer() {
           </div>
         </div>
 
-        <div className="border-t border-gray-700 mt-8 pt-6 text-center">
+        <div className="border-t mt-8 pt-6 text-center border-transparent">
           <p className="text-gray-400 text-sm">© 2025 UGC. All rights reserved.</p>
         </div>
       </div>
