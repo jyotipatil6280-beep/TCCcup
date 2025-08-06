@@ -26,7 +26,7 @@ export default function Navbar() {
           <Link href="/" className="flex items-center space-x-3">
             <img src="https://i.ibb.co/jkVCpXPv/TCC-LOGO.png" alt="TCC Logo" className="h-10 w-10 object-contain" />
             <div className="text-white">
-              <div className="font-bold text-lg">Twitter Community Cup</div>
+              <div className="font-bold text-lg">{"TCC | UGC"}</div>
             </div>
           </Link>
 

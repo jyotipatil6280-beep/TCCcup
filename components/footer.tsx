@@ -8,7 +8,7 @@ export default function Footer() {
             <div className="flex items-center space-x-3">
               <img src="https://i.ibb.co/jkVCpXPv/TCC-LOGO.png" alt="TCC Logo" className="h-8 w-8 object-contain" />
               <div className="text-white">
-                <div className="font-bold">Twitter Community Cup</div>
+                <div className="font-bold">TCC</div>
               </div>
             </div>
             <p className="text-gray-300 text-sm">
@@ -40,14 +40,14 @@ export default function Footer() {
             <h3 className="text-white font-semibold">Contact</h3>
             <div className="space-y-2 text-sm text-gray-300">
               <p>For support and inquiries:</p>
-              <p>Email: support@twittercommunitycup.com</p>
-              <p>Discord: Twitter Community Cup Official</p>
+              <p>X: @UNIVERSALGC1</p>
+              <p>Organizer: @PravAwym ; @Ncnlkncp</p>
             </div>
           </div>
         </div>
 
         <div className="border-t border-gray-700 mt-8 pt-6 text-center">
-          <p className="text-gray-400 text-sm">© 2024 Twitter Community Cup. All rights reserved.</p>
+          <p className="text-gray-400 text-sm">© 2025 UGC. All rights reserved.</p>
         </div>
       </div>
     </footer>

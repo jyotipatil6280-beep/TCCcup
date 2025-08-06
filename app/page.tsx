@@ -3,7 +3,7 @@
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
-import { Trophy, Users, Calendar, Award, ArrowRight, Play } from "lucide-react"
+import { Trophy, ChefHatIcon, Calendar, Award, ArrowRight, Play } from "lucide-react"
 import PageLayout from "../components/page-layout"
 
 export default function HomePage() {
@@ -57,32 +57,32 @@ export default function HomePage() {
             <Card className="bg-gradient-to-br from-blue-800/50 to-teal-800/50 border border-cyan-500/30 rounded-2xl">
               <CardContent className="p-6 text-center">
                 <Trophy className="w-12 h-12 text-cyan-400 mx-auto mb-4" />
-                <h3 className="text-xl font-semibold text-white mb-2">Prize Pool</h3>
+                <h3 className="text-xl font-semibold text-white mb-2">{"₹5000"}</h3>
                 <p className="text-gray-300">Exciting rewards for winners</p>
               </CardContent>
             </Card>
 
             <Card className="bg-gradient-to-br from-blue-800/50 to-teal-800/50 border border-cyan-500/30 rounded-2xl">
               <CardContent className="p-6 text-center">
-                <Users className="w-12 h-12 text-green-400 mx-auto mb-4" />
-                <h3 className="text-xl font-semibold text-white mb-2">Team Format</h3>
-                <p className="text-gray-300">5-player squad battles</p>
+                <ChefHatIcon className="w-12 h-12 text-green-400 mx-auto mb-4" />
+                <h3 className="text-xl font-semibold text-white mb-2">SMASH RULE!!</h3>
+                <p className="text-gray-300">More About It In Format Section</p>
               </CardContent>
             </Card>
 
             <Card className="bg-gradient-to-br from-blue-800/50 to-teal-800/50 border border-cyan-500/30 rounded-2xl">
               <CardContent className="p-6 text-center">
                 <Calendar className="w-12 h-12 text-blue-400 mx-auto mb-4" />
-                <h3 className="text-xl font-semibold text-white mb-2">Schedule</h3>
-                <p className="text-gray-300">Multiple rounds & finals</p>
+                <h3 className="text-xl font-semibold text-white mb-2">RONDO MAP</h3>
+                <p className="text-gray-300">Even before PUBG MOBILE</p>
               </CardContent>
             </Card>
 
             <Card className="bg-gradient-to-br from-blue-800/50 to-teal-800/50 border border-cyan-500/30 rounded-2xl">
               <CardContent className="p-6 text-center">
                 <Award className="w-12 h-12 text-yellow-400 mx-auto mb-4" />
-                <h3 className="text-xl font-semibold text-white mb-2">Recognition</h3>
-                <p className="text-gray-300">Certificates & titles</p>
+                <h3 className="text-xl font-semibold text-white mb-2">{"LIVE STATS"}</h3>
+                <p className="text-gray-300">{"Check it Out Via Stats!!!"}</p>
               </CardContent>
             </Card>
           </div>
