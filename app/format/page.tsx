@@ -156,7 +156,7 @@ export default function FormatPage() {
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4 text-gray-300">
-              <p className="text-center text-lg">₹5000</p>
+              <p className="text-center text-lg font-extrabold text-amber-300">₹5000 INR in PRIZEPOOL!!!!  </p>
               <div className="grid md:grid-cols-3 gap-4 mt-4">
                 <div className="text-center p-4 bg-blue-800/30 rounded-xl">
                   <h3 className="text-cyan-300 font-semibold mb-2">🏆 Champion</h3>

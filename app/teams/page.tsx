@@ -122,7 +122,7 @@ export default function TeamsPage() {
               {filteredTeams.map((team) => (
                 <Card
                   key={team.id}
-                  className="bg-gradient-to-br from-blue-800/70 to-teal-700/70 border border-cyan-500/30 rounded-2xl hover:shadow-xl transition-all duration-300 hover:border-cyan-400/50"
+                  className="bg-gradient-to-br from-blue-800/70 to-teal-700/70 border hover:shadow-xl transition-all duration-300 hover:border-cyan-400/50 rounded-xl shadow-lg border-transparent"
                 >
                   <CardHeader className="pb-4">
                     <div className="flex items-center justify-between mb-3">

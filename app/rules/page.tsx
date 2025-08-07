@@ -61,7 +61,7 @@ export default function RulesPage() {
                     <strong className="text-white">Safe Zone 1 Display Time:</strong>
                   </p>
                   <p className="ml-4">• 80s for Miramar & Erangel</p>
-                  <p className="ml-4">• 60s for Sanhok</p>
+                  <p className="ml-4">• 80s for RONDO</p>
                   <p>
                     <strong className="text-white">ALL Weapons:</strong> x2
                   </p>
