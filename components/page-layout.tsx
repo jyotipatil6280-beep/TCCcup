@@ -10,7 +10,7 @@ export default function PageLayout({ children }: PageLayoutProps) {
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-900 via-teal-800 to-green-800 flex flex-col">
       <Navbar />
-      <main className="flex-1 border-transparent">{children}</main>
+      <main className="flex-1 border-transparent text-white">{children}</main>
       <Footer />
     </div>
   )

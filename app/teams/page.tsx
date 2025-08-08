@@ -122,7 +122,7 @@ export default function TeamsPage() {
               {filteredTeams.map((team) => (
                 <Card
                   key={team.id}
-                  className="bg-gradient-to-br from-blue-800/70 to-teal-700/70 border hover:shadow-xl transition-all duration-300 hover:border-cyan-400/50 rounded-xl shadow-lg border-transparent"
+                  className="bg-gradient-to-br from-blue-800/70 to-teal-700/70 border hover:shadow-xl transition-all duration-300 hover:border-cyan-400/50 rounded-xl shadow-lg border-transparent text-[rgba(6,129,243,1)]"
                 >
                   <CardHeader className="pb-4">
                     <div className="flex items-center justify-between mb-3">
@@ -131,7 +131,7 @@ export default function TeamsPage() {
                           <img
                             src={team.team_logo_url || "/placeholder.svg"}
                             alt={`${team.team_name} logo`}
-                            className="w-12 h-12 rounded-full object-cover border-2 border-cyan-400/50"
+                            className="w-12 h-12 rounded-full object-cover border-2 border-transparent"
                           />
                         ) : (
                           <div className="w-12 h-12 bg-gradient-to-br from-cyan-400 to-green-500 rounded-full flex items-center justify-center">
