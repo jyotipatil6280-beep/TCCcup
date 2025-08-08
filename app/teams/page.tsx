@@ -131,7 +131,7 @@ export default function TeamsPage() {
                           <img
                             src={team.team_logo_url || "/placeholder.svg"}
                             alt={`${team.team_name} logo`}
-                            className="w-12 h-12 rounded-full object-cover border-2 border-transparent"
+                            className="w-12 h-12 rounded-full object-cover border-2 border-transparent bg-transparent text-transparent shadow-none"
                           />
                         ) : (
                           <div className="w-12 h-12 bg-gradient-to-br from-cyan-400 to-green-500 rounded-full flex items-center justify-center">
