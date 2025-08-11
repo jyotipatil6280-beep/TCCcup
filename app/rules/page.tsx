@@ -202,7 +202,7 @@ export default function RulesPage() {
                       <span className="text-purple-400 font-bold">1 point</span>
                     </div>
                     <div className="flex justify-between p-2 bg-gray-700/20 rounded">
-                      <span>9th - 16th Place</span>
+                      <span>9th - 20th Place</span>
                       <span className="text-gray-400 font-bold">0 points</span>
                     </div>
                   </div>
