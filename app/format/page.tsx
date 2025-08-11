@@ -125,7 +125,7 @@ export default function FormatPage() {
               <div className="space-y-3">
                 <p>1. Teams play using regular tournament rules until a team reaches the Match Point threshold.</p>
                 <p>
-                  2. <strong className="text-cyan-300">Match Point = Top 1's points after Match #12 + 15 points</strong>
+                  2. <strong className="text-cyan-300">Match Point = Top 1's points after Match #12 + 10 points</strong>
                 </p>
                 <p>
                   3. Once a team reaches Match Point, they become{" "}
