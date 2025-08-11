@@ -3,7 +3,7 @@
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
-import { Trophy, ArrowRight, BarChart3, Clock, Users, Target, Zap } from "lucide-react"
+import { Trophy, ChefHatIcon, Calendar, Award, ArrowRight, BarChart3, Clock } from "lucide-react"
 import PageLayout from "../components/page-layout"
 import { useState, useEffect } from "react"
 
@@ -23,9 +23,10 @@ const CountdownTimer = () => {
   useEffect(() => {
     const calculateTimeLeft = () => {
       const today = new Date()
-      today.setHours(19, 30, 0, 0)
+      today.setHours(19, 30, 0, 0) // 7:30 PM today
 
-      const istOffset = 5.5 * 60 * 60 * 1000
+      // Convert to IST (UTC+5:30)
+      const istOffset = 5.5 * 60 * 60 * 1000 // IST offset in milliseconds
       const now = new Date()
       const istNow = new Date(now.getTime() + istOffset)
       const istTarget = new Date(today.getTime() + istOffset)
@@ -50,27 +51,18 @@ const CountdownTimer = () => {
   }, [])
 
   return (
-    <div className="flex justify-center gap-4 mb-8">
-      <div className="relative">
-        <div className="bg-white/10 backdrop-blur-md rounded-2xl p-4 min-w-[80px] text-center border border-white/20 shadow-xl">
-          <div className="text-3xl font-bold text-white mb-1">{String(timeLeft.hours).padStart(2, "0")}</div>
-          <div className="text-xs text-gray-300 uppercase tracking-wider">Hours</div>
-        </div>
-        <div className="absolute -top-1 -right-1 w-3 h-3 bg-blue-400 rounded-full animate-pulse"></div>
+    <div className="flex justify-center gap-3 mb-6">
+      <div className="bg-gradient-to-br from-blue-800/70 to-teal-800/70 rounded-lg p-3 min-w-[60px] text-center border border-cyan-500/30">
+        <div className="text-xl md:text-2xl font-bold text-cyan-300">{String(timeLeft.hours).padStart(2, "0")}</div>
+        <div className="text-xs text-gray-400">Hours</div>
       </div>
-      <div className="relative">
-        <div className="bg-white/10 backdrop-blur-md rounded-2xl p-4 min-w-[80px] text-center border border-white/20 shadow-xl">
-          <div className="text-3xl font-bold text-white mb-1">{String(timeLeft.minutes).padStart(2, "0")}</div>
-          <div className="text-xs text-gray-300 uppercase tracking-wider">Minutes</div>
-        </div>
-        <div className="absolute -top-1 -right-1 w-3 h-3 bg-green-400 rounded-full animate-pulse"></div>
+      <div className="bg-gradient-to-br from-blue-800/70 to-teal-800/70 rounded-lg p-3 min-w-[60px] text-center border border-cyan-500/30">
+        <div className="text-xl md:text-2xl font-bold text-green-300">{String(timeLeft.minutes).padStart(2, "0")}</div>
+        <div className="text-xs text-gray-400">Minutes</div>
       </div>
-      <div className="relative">
-        <div className="bg-white/10 backdrop-blur-md rounded-2xl p-4 min-w-[80px] text-center border border-white/20 shadow-xl">
-          <div className="text-3xl font-bold text-white mb-1">{String(timeLeft.seconds).padStart(2, "0")}</div>
-          <div className="text-xs text-gray-300 uppercase tracking-wider">Seconds</div>
-        </div>
-        <div className="absolute -top-1 -right-1 w-3 h-3 bg-yellow-400 rounded-full animate-pulse"></div>
+      <div className="bg-gradient-to-br from-blue-800/70 to-teal-800/70 rounded-lg p-3 min-w-[60px] text-center border border-cyan-500/30">
+        <div className="text-xl md:text-2xl font-bold text-yellow-300">{String(timeLeft.seconds).padStart(2, "0")}</div>
+        <div className="text-xs text-gray-400">Seconds</div>
       </div>
     </div>
   )
@@ -79,140 +71,112 @@ const CountdownTimer = () => {
 export default function HomePage() {
   return (
     <PageLayout>
-      <section className="relative py-24 px-4 overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-r from-blue-600/20 via-purple-600/20 to-teal-600/20 backdrop-blur-3xl"></div>
-        <div className="container mx-auto text-center relative z-10">
+      {/* Hero Section */}
+      <section className="relative py-20 px-4">
+        <div className="container mx-auto text-center">
           <div className="mb-8">
-            <div className="relative inline-block">
-              <img
-                src="https://i.ibb.co/jkVCpXPv/TCC-LOGO.png"
-                alt="Twitter Community Cup Logo"
-                className="w-40 h-32 mx-auto mb-6 object-contain drop-shadow-2xl"
-              />
-              <div className="absolute -inset-4 bg-gradient-to-r from-blue-400/30 to-teal-400/30 rounded-full blur-xl"></div>
-            </div>
+            <img
+              src="https://i.ibb.co/jkVCpXPv/TCC-LOGO.png"
+              alt="Twitter Community Cup Logo"
+              className="w-32 h-24 mx-auto mb-6 object-contain"
+            />
           </div>
 
-          <h1 className="text-6xl md:text-8xl font-black bg-gradient-to-r from-white via-blue-200 to-teal-200 bg-clip-text text-transparent mb-6 tracking-tight">
+          <h1 className="text-5xl md:text-7xl font-bold bg-gradient-to-r from-cyan-300 via-green-400 to-emerald-400 bg-clip-text text-transparent mb-6">
             Twitter Community Cup
           </h1>
 
-          <p className="text-xl text-gray-300 mb-12 max-w-3xl mx-auto leading-relaxed">
-            Experience the ultimate BGMI tournament with cutting-edge gameplay, professional streaming, and incredible
-            prizes.
+          <p className="text-lg text-gray-400 mb-8 max-w-2xl mx-auto">
+            Join the ultimate BGMI tournament experience. Compete with the best teams, showcase your skills, and win
+            amazing prizes.
           </p>
 
-          <div className="flex flex-col sm:flex-row gap-6 justify-center mb-16">
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            {/* LIVE Button */}
             <Link href="https://www.youtube.com/watch?v=IKVtR2zpMog" target="_blank" rel="noopener noreferrer">
-              <Button className="bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white rounded-2xl text-lg shadow-2xl py-4 px-8 transition-all duration-300 transform hover:scale-105 font-bold border-0">
+              <Button
+                variant="link"
+                className="bg-gradient-to-r from-blue-600 via-teal-600 to-green-600 hover:from-blue-700 hover:via-teal-700 hover:to-green-700 text-white rounded-2xl text-base shadow-lg py-2.5 transition-all duration-300 transform hover:scale-105 font-semibold px-4"
+              >
                 <div className="flex items-center gap-3">
-                  <YouTubeIcon className="w-6 h-6 text-white" />
-                  <span className="flex items-center gap-2">
-                    <span className="w-2 h-2 bg-white rounded-full animate-pulse"></span>
-                    WATCH LIVE
+                  <YouTubeIcon className="w-5 h-5 text-white" />
+                  <span className="flex items-center gap-1">
+                    <span className="w-2 h-2 bg-green-300 rounded-full animate-pulse"></span>
+                    LIVE
                   </span>
                 </div>
               </Button>
             </Link>
 
+            {/* Stats Button */}
             <Link href="/stats">
-              <Button className="bg-white/10 backdrop-blur-md border border-white/20 text-white hover:bg-white/20 py-4 px-8 rounded-2xl text-lg shadow-xl transition-all duration-300 transform hover:scale-105">
+              <Button
+                variant="outline"
+                className="border-cyan-400 text-cyan-300 hover:bg-cyan-400/10 py-4 px-8 rounded-2xl text-lg bg-transparent"
+              >
                 <BarChart3 className="w-5 h-5 mr-2" />
-                View Statistics
+                View Stats
               </Button>
             </Link>
           </div>
-
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-4xl mx-auto">
-            <div className="bg-white/5 backdrop-blur-md rounded-xl p-4 border border-white/10">
-              <div className="text-2xl font-bold text-white">32</div>
-              <div className="text-sm text-gray-400">Teams</div>
-            </div>
-            <div className="bg-white/5 backdrop-blur-md rounded-xl p-4 border border-white/10">
-              <div className="text-2xl font-bold text-white">₹5000</div>
-              <div className="text-sm text-gray-400">Prize Pool</div>
-            </div>
-            <div className="bg-white/5 backdrop-blur-md rounded-xl p-4 border border-white/10">
-              <div className="text-2xl font-bold text-white">2</div>
-              <div className="text-sm text-gray-400">Days</div>
-            </div>
-            <div className="bg-white/5 backdrop-blur-md rounded-xl p-4 border border-white/10">
-              <div className="text-2xl font-bold text-white">LIVE</div>
-              <div className="text-sm text-gray-400">Status</div>
-            </div>
-          </div>
         </div>
       </section>
 
-      <section className="py-20 px-4">
+      {/* Features Section */}
+      <section className="py-16 px-4">
         <div className="container mx-auto">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-bold text-white mb-4">Tournament Features</h2>
-            <p className="text-xl text-gray-400 max-w-2xl mx-auto">Discover what makes this tournament special</p>
-          </div>
+          <h2 className="text-3xl md:text-4xl font-bold text-center mb-12 text-white">Tournament Highlights</h2>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-            <Card className="bg-white/5 backdrop-blur-md border border-white/10 rounded-3xl hover:bg-white/10 transition-all duration-300 transform hover:scale-105 shadow-2xl">
-              <CardContent className="p-8 text-center">
-                <div className="w-16 h-16 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg">
-                  <Trophy className="w-8 h-8 text-white" />
-                </div>
-                <h3 className="text-2xl font-bold text-white mb-3">₹5000 Prize</h3>
-                <p className="text-gray-400 leading-relaxed">Massive rewards awaiting the champions</p>
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <Card className="bg-gradient-to-br from-blue-800/50 to-teal-800/50 border border-cyan-500/30 rounded-2xl">
+              <CardContent className="p-6 text-center">
+                <Trophy className="w-12 h-12 text-cyan-400 mx-auto mb-4" />
+                <h3 className="text-xl font-semibold text-white mb-2">{"₹5000"}</h3>
+                <p className="text-gray-300">Exciting rewards for winners</p>
               </CardContent>
             </Card>
 
-            <Card className="bg-white/5 backdrop-blur-md border border-white/10 rounded-3xl hover:bg-white/10 transition-all duration-300 transform hover:scale-105 shadow-2xl">
-              <CardContent className="p-8 text-center">
-                <div className="w-16 h-16 bg-gradient-to-br from-green-400 to-emerald-500 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg">
-                  <Zap className="w-8 h-8 text-white" />
-                </div>
-                <h3 className="text-2xl font-bold text-white mb-3">SMASH RULE</h3>
-                <p className="text-gray-400 leading-relaxed">Unique gameplay mechanics for intense action</p>
+            <Card className="bg-gradient-to-br from-blue-800/50 to-teal-800/50 border border-cyan-500/30 rounded-2xl">
+              <CardContent className="p-6 text-center">
+                <ChefHatIcon className="w-12 h-12 text-green-400 mx-auto mb-4" />
+                <h3 className="text-xl font-semibold text-white mb-2">SMASH RULE!!</h3>
+                <p className="text-gray-300">More About It In Format Section</p>
               </CardContent>
             </Card>
 
-            <Card className="bg-white/5 backdrop-blur-md border border-white/10 rounded-3xl hover:bg-white/10 transition-all duration-300 transform hover:scale-105 shadow-2xl">
-              <CardContent className="p-8 text-center">
-                <div className="w-16 h-16 bg-gradient-to-br from-blue-400 to-cyan-500 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg">
-                  <Target className="w-8 h-8 text-white" />
-                </div>
-                <h3 className="text-2xl font-bold text-white mb-3">RONDO MAP</h3>
-                <p className="text-gray-400 leading-relaxed">Exclusive map experience before global release</p>
+            <Card className="bg-gradient-to-br from-blue-800/50 to-teal-800/50 border border-cyan-500/30 rounded-2xl">
+              <CardContent className="p-6 text-center">
+                <Calendar className="w-12 h-12 text-blue-400 mx-auto mb-4" />
+                <h3 className="text-xl font-semibold text-white mb-2">RONDO MAP</h3>
+                <p className="text-gray-300">Even before PUBG MOBILE</p>
               </CardContent>
             </Card>
 
-            <Card className="bg-white/5 backdrop-blur-md border border-white/10 rounded-3xl hover:bg-white/10 transition-all duration-300 transform hover:scale-105 shadow-2xl">
-              <CardContent className="p-8 text-center">
-                <div className="w-16 h-16 bg-gradient-to-br from-purple-400 to-pink-500 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg">
-                  <BarChart3 className="w-8 h-8 text-white" />
-                </div>
-                <h3 className="text-2xl font-bold text-white mb-3">LIVE STATS</h3>
-                <p className="text-gray-400 leading-relaxed">Real-time performance tracking and analytics</p>
+            <Card className="bg-gradient-to-br from-blue-800/50 to-teal-800/50 border border-cyan-500/30 rounded-2xl">
+              <CardContent className="p-6 text-center">
+                <Award className="w-12 h-12 text-yellow-400 mx-auto mb-4" />
+                <h3 className="text-xl font-semibold text-white mb-2">{"LIVE STATS"}</h3>
+                <p className="text-gray-300">{"Check it Out Via Stats!!!"}</p>
               </CardContent>
             </Card>
           </div>
         </div>
       </section>
 
-      <section className="py-20 px-4">
+      <section className="py-16 px-4">
         <div className="container mx-auto">
-          <Card className="bg-gradient-to-r from-blue-900/40 via-purple-900/40 to-teal-900/40 backdrop-blur-md border border-white/20 rounded-3xl shadow-2xl overflow-hidden">
-            <div className="absolute inset-0 bg-gradient-to-r from-blue-600/10 via-purple-600/10 to-teal-600/10"></div>
-            <CardContent className="p-12 text-center relative z-10">
-              <div className="flex items-center justify-center gap-4 mb-6">
-                <div className="w-12 h-12 bg-gradient-to-br from-blue-400 to-teal-400 rounded-2xl flex items-center justify-center shadow-lg">
-                  <Clock className="w-6 h-6 text-white" />
-                </div>
-                <h2 className="text-3xl md:text-4xl font-bold text-white">DAY 2 COUNTDOWN</h2>
+          <Card className="bg-gradient-to-r from-blue-900/90 to-teal-900/90 border border-cyan-500/30 rounded-3xl">
+            <CardContent className="p-8 text-center">
+              <div className="flex items-center justify-center gap-3 mb-4">
+                <Clock className="w-6 h-6 text-cyan-400" />
+                <h2 className="text-2xl md:text-3xl font-bold text-white">DAY 2 STARTS IN</h2>
               </div>
-              <p className="text-xl text-gray-300 mb-8">Today at 7:30 PM IST - The battle continues!</p>
+              <p className="text-lg text-gray-300 mb-6">Today at 7:30 PM IST - Don't miss the action!</p>
               <CountdownTimer />
               <Link href="/teams">
-                <Button className="bg-gradient-to-r from-blue-500 via-purple-500 to-teal-500 hover:from-blue-600 hover:via-purple-600 hover:to-teal-600 text-white font-bold py-4 px-8 rounded-2xl text-lg transition-all duration-300 transform hover:scale-105 shadow-xl border-0">
-                  <Users className="w-5 h-5 mr-2" />
-                  View All Teams
-                  <ArrowRight className="w-5 h-5 ml-2" />
+                <Button className="bg-gradient-to-r from-cyan-500 to-green-500 hover:from-cyan-600 hover:to-green-600 text-white font-bold py-3 px-6 rounded-2xl text-base transition-all duration-300 transform hover:scale-105">
+                  View Registered Teams
+                  <ArrowRight className="w-4 h-4 ml-2" />
                 </Button>
               </Link>
             </CardContent>
