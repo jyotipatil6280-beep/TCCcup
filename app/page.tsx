@@ -38,7 +38,7 @@ export default function HomePage() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             {/* LIVE Button */}
             <Link
-              href="https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+              href="https://www.youtube.com/watch?v=IKVtR2zpMog"
               target="_blank"
               rel="noopener noreferrer"
             >
