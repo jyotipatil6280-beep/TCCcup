@@ -36,19 +36,27 @@ export default function HomePage() {
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button
-              variant="link"
-              className="bg-gradient-to-r from-blue-600 via-teal-600 to-green-600 hover:from-blue-700 hover:via-teal-700 hover:to-green-700 text-white rounded-2xl text-base shadow-lg py-2.5 transition-all duration-300 transform hover:scale-105 font-semibold px-4"
+            {/* LIVE Button */}
+            <Link
+              href="https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+              target="_blank"
+              rel="noopener noreferrer"
             >
-              <div className="flex items-center gap-3">
-                <YouTubeIcon className="w-5 h-5 text-white" />
-                <span className="flex items-center gap-1">
-                  <span className="w-2 h-2 bg-green-300 rounded-full animate-pulse"></span>
-                  LIVE
-                </span>
-              </div>
-            </Button>
+              <Button
+                variant="link"
+                className="bg-gradient-to-r from-blue-600 via-teal-600 to-green-600 hover:from-blue-700 hover:via-teal-700 hover:to-green-700 text-white rounded-2xl text-base shadow-lg py-2.5 transition-all duration-300 transform hover:scale-105 font-semibold px-4"
+              >
+                <div className="flex items-center gap-3">
+                  <YouTubeIcon className="w-5 h-5 text-white" />
+                  <span className="flex items-center gap-1">
+                    <span className="w-2 h-2 bg-green-300 rounded-full animate-pulse"></span>
+                    LIVE
+                  </span>
+                </div>
+              </Button>
+            </Link>
 
+            {/* Stats Button */}
             <Link href="/stats">
               <Button
                 variant="outline"
@@ -125,3 +133,5 @@ export default function HomePage() {
     </PageLayout>
   )
 }
+
+      
