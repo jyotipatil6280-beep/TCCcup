@@ -3,8 +3,14 @@
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
-import { Trophy, ChefHatIcon, Calendar, Award, ArrowRight, Play } from "lucide-react"
+import { Trophy, ChefHatIcon, Calendar, Award, ArrowRight, BarChart3 } from "lucide-react"
 import PageLayout from "../components/page-layout"
+
+const YouTubeIcon = ({ className }: { className?: string }) => (
+  <svg viewBox="0 0 24 24" fill="currentColor" className={className}>
+    <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93-.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z" />
+  </svg>
+)
 
 export default function HomePage() {
   return (
@@ -30,18 +36,26 @@ export default function HomePage() {
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <div className="bg-gradient-to-r from-red-600 to-orange-600 text-white font-bold rounded-2xl text-lg shadow-lg px-2 py-1">
-              <Trophy className="w-5 h-5 mr-2 inline" />
-              Registration Closed
-            </div>
+            <Button
+              variant="link"
+              className="bg-gradient-to-r from-blue-600 via-teal-600 to-green-600 hover:from-blue-700 hover:via-teal-700 hover:to-green-700 text-white rounded-2xl text-base shadow-lg py-2.5 transition-all duration-300 transform hover:scale-105 font-semibold px-4"
+            >
+              <div className="flex items-center gap-3">
+                <YouTubeIcon className="w-5 h-5 text-white" />
+                <span className="flex items-center gap-1">
+                  <span className="w-2 h-2 bg-green-300 rounded-full animate-pulse"></span>
+                  LIVE
+                </span>
+              </div>
+            </Button>
 
-            <Link href="/rules">
+            <Link href="/stats">
               <Button
                 variant="outline"
                 className="border-cyan-400 text-cyan-300 hover:bg-cyan-400/10 py-4 px-8 rounded-2xl text-lg bg-transparent"
               >
-                <Play className="w-5 h-5 mr-2" />
-                View Rules
+                <BarChart3 className="w-5 h-5 mr-2" />
+                View Stats
               </Button>
             </Link>
           </div>
