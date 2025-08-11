@@ -1,13 +1,24 @@
 "use client"
 
 import { Label } from "@/components/ui/label"
-
 import { useState, useEffect } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Trophy, Target, Crown, Zap, Users, TrendingUp, AlertCircle, Calendar, User, ListOrdered } from "lucide-react"
+import {
+  Trophy,
+  Target,
+  Crown,
+  Zap,
+  Users,
+  AlertCircle,
+  Calendar,
+  User,
+  ListOrdered,
+  Activity,
+  BarChart3,
+} from "lucide-react"
 import PageLayout from "../../components/page-layout"
 import { supabase } from "../../lib/supabase"
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
@@ -344,7 +355,7 @@ export default function StatsPage() {
 
   const tabs = [
     { id: "overall", label: "Overall Standings", icon: Trophy },
-    { id: "match-wise", label: "Match Wise Standings", icon: ListOrdered }, // New tab
+    { id: "match-wise", label: "Match Wise Standings", icon: ListOrdered },
     { id: "kills", label: "Top Fraggers", icon: Target },
     { id: "team-players", label: "Team Player Stats", icon: Users },
   ]
@@ -355,8 +366,14 @@ export default function StatsPage() {
     return (
       <PageLayout>
         <div className="container mx-auto px-4 py-12">
-          <div className="text-center">
-            <div className="text-white">Loading tournament statistics...</div>
+          <div className="flex items-center justify-center min-h-[400px]">
+            <div className="text-center">
+              <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-teal-500 rounded-2xl flex items-center justify-center mx-auto mb-4 animate-pulse">
+                <Activity className="w-8 h-8 text-white" />
+              </div>
+              <h3 className="text-xl font-semibold text-white mb-2">Loading Tournament Data</h3>
+              <p className="text-gray-400">Fetching the latest statistics...</p>
+            </div>
           </div>
         </div>
       </PageLayout>
@@ -367,13 +384,20 @@ export default function StatsPage() {
     return (
       <PageLayout>
         <div className="container mx-auto px-4 py-12">
-          <div className="text-center">
-            <AlertCircle className="w-16 h-16 text-red-400 mx-auto mb-4" />
-            <h2 className="text-2xl font-bold text-white mb-4">Error Loading Stats</h2>
-            <p className="text-gray-400 mb-6">{error}</p>
-            <Button onClick={fetchStats} className="bg-gradient-to-r from-cyan-500 to-green-500 text-white">
-              Try Again
-            </Button>
+          <div className="flex items-center justify-center min-h-[400px]">
+            <Card className="bg-white/5 backdrop-blur-md border border-red-500/20 rounded-3xl p-8 text-center max-w-md">
+              <div className="w-16 h-16 bg-gradient-to-r from-red-500 to-red-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                <AlertCircle className="w-8 h-8 text-white" />
+              </div>
+              <h2 className="text-2xl font-bold text-white mb-4">Unable to Load Stats</h2>
+              <p className="text-gray-400 mb-6">{error}</p>
+              <Button
+                onClick={fetchStats}
+                className="bg-gradient-to-r from-blue-500 to-teal-500 hover:from-blue-600 hover:to-teal-600 text-white border-0 rounded-xl px-6 py-3"
+              >
+                Retry Loading
+              </Button>
+            </Card>
           </div>
         </div>
       </PageLayout>
@@ -383,137 +407,177 @@ export default function StatsPage() {
   return (
     <PageLayout>
       <div className="container mx-auto px-4 py-12">
-        <div className="text-center mb-12">
-          <h1 className="text-4xl md:text-6xl font-bold bg-gradient-to-r from-cyan-300 via-green-400 to-emerald-400 bg-clip-text text-transparent mb-4">
-            Tournament Stats
-          </h1>
-          <p className="text-gray-300 text-lg">Live statistics and leaderboards</p>
-          <div className="flex justify-center gap-4 mt-4">
-            <Badge variant="secondary" className="bg-green-900/50 text-green-300 px-4 py-2 rounded-full">
-              <Users className="w-4 h-4 mr-1" />
-              {teamStats.length > 0 ? `${teamStats.length} Teams Competing` : "Tournament Setup"}
-            </Badge>
-            <Badge variant="secondary" className="bg-blue-900/50 text-blue-300 px-4 py-2 rounded-full">
-              <TrendingUp className="w-4 h-4 mr-1" />
-              {teamStats.length > 0 ? "Live Updates" : "Awaiting Matches"}
-            </Badge>
+        <div className="text-center mb-16">
+          <div className="relative inline-block mb-6">
+            <h1 className="text-5xl md:text-7xl font-black bg-gradient-to-r from-white via-blue-200 to-teal-200 bg-clip-text text-transparent">
+              Tournament Analytics
+            </h1>
+            <div className="absolute -inset-4 bg-gradient-to-r from-blue-400/20 to-teal-400/20 rounded-full blur-xl"></div>
+          </div>
+          <p className="text-xl text-gray-300 mb-8 max-w-2xl mx-auto">
+            Real-time performance insights and comprehensive tournament statistics
+          </p>
+
+          <div className="flex flex-wrap justify-center gap-4">
+            <div className="bg-white/5 backdrop-blur-md rounded-2xl p-4 border border-white/10 min-w-[140px]">
+              <div className="flex items-center gap-2 mb-1">
+                <Users className="w-4 h-4 text-blue-400" />
+                <span className="text-sm text-gray-400">Active Teams</span>
+              </div>
+              <div className="text-2xl font-bold text-white">{teamStats.length || 0}</div>
+            </div>
+            <div className="bg-white/5 backdrop-blur-md rounded-2xl p-4 border border-white/10 min-w-[140px]">
+              <div className="flex items-center gap-2 mb-1">
+                <Activity className="w-4 h-4 text-green-400" />
+                <span className="text-sm text-gray-400">Status</span>
+              </div>
+              <div className="text-lg font-bold text-green-400">LIVE</div>
+            </div>
+            <div className="bg-white/5 backdrop-blur-md rounded-2xl p-4 border border-white/10 min-w-[140px]">
+              <div className="flex items-center gap-2 mb-1">
+                <BarChart3 className="w-4 h-4 text-purple-400" />
+                <span className="text-sm text-gray-400">Matches</span>
+              </div>
+              <div className="text-2xl font-bold text-white">{allMatches.length || 0}</div>
+            </div>
           </div>
         </div>
 
-        {/* Tab Navigation */}
-        <div className="flex flex-wrap justify-center gap-2 mb-8">
+        <div className="flex flex-wrap justify-center gap-3 mb-12">
           {tabs.map((tab) => {
             const Icon = tab.icon
             return (
               <Button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                variant={activeTab === tab.id ? "default" : "outline"}
-                className={`flex items-center gap-2 px-4 py-2 rounded-xl transition-all duration-200 ${
+                className={`flex items-center gap-3 px-6 py-3 rounded-2xl transition-all duration-300 transform hover:scale-105 border-0 ${
                   activeTab === tab.id
-                    ? "bg-gradient-to-r from-cyan-500 to-green-500 text-white border-none"
-                    : "bg-transparent border-cyan-400 text-cyan-300 hover:bg-cyan-400/10"
+                    ? "bg-gradient-to-r from-blue-500 via-purple-500 to-teal-500 text-white shadow-xl"
+                    : "bg-white/5 backdrop-blur-md border border-white/10 text-gray-300 hover:bg-white/10"
                 }`}
               >
-                <Icon className="w-4 h-4" />
-                {tab.label}
+                <Icon className="w-5 h-5" />
+                <span className="font-medium">{tab.label}</span>
               </Button>
             )
           })}
         </div>
 
-        <div className="max-w-6xl mx-auto">
-          {/* Overall Standings */}
+        <div className="max-w-7xl mx-auto">
           {activeTab === "overall" && (
-            <Card className="bg-gradient-to-br from-blue-900/90 to-teal-900/90 border-gray-700 rounded-3xl">
-              <CardHeader>
-                <CardTitle className="text-2xl text-white flex items-center gap-2">
-                  <Trophy className="w-6 h-6 text-cyan-400" />
+            <Card className="bg-white/5 backdrop-blur-md border border-white/10 rounded-3xl shadow-2xl overflow-hidden">
+              <div className="bg-gradient-to-r from-blue-600/20 via-purple-600/20 to-teal-600/20 p-6">
+                <CardTitle className="text-3xl font-bold text-white flex items-center gap-3">
+                  <div className="w-12 h-12 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-2xl flex items-center justify-center shadow-lg">
+                    <Trophy className="w-6 h-6 text-white" />
+                  </div>
                   Overall Tournament Standings
                 </CardTitle>
-              </CardHeader>
-              <CardContent>
+                <p className="text-gray-300 mt-2">Current leaderboard based on total points and performance</p>
+              </div>
+              <CardContent className="p-0">
                 {teamStats.length === 0 ? (
-                  <div className="text-center py-8">
-                    <Trophy className="w-16 h-16 text-gray-500 mx-auto mb-4" />
-                    <h3 className="text-xl font-semibold text-white mb-2">Tournament Starting Soon</h3>
-                    <p className="text-gray-400">Match results will appear here once matches begin</p>
+                  <div className="text-center py-16">
+                    <div className="w-20 h-20 bg-gradient-to-br from-gray-600 to-gray-700 rounded-3xl flex items-center justify-center mx-auto mb-6">
+                      <Trophy className="w-10 h-10 text-gray-400" />
+                    </div>
+                    <h3 className="text-2xl font-bold text-white mb-3">Tournament Starting Soon</h3>
+                    <p className="text-gray-400 text-lg">Match results will appear here once matches begin</p>
                   </div>
                 ) : (
                   <div className="overflow-x-auto">
                     <table className="w-full">
                       <thead>
-                        <tr className="border-b border-gray-600">
-                          <th className="text-left py-3 px-4 text-gray-300 font-semibold">Rank</th>
-                          <th className="text-left py-3 px-4 text-gray-300 font-semibold">Team</th>
-                          <th className="text-center py-3 px-4 text-gray-300 font-semibold">Points</th>
-                          <th className="text-center py-3 px-4 text-gray-300 font-semibold">Matches</th>
-                          <th className="text-center py-3 px-4 text-gray-300 font-semibold">Kills</th>
-                          <th className="text-center py-3 px-4 text-gray-300 font-semibold">WWCD</th>
-                          <th className="text-center py-3 px-4 text-gray-300 font-semibold">Avg Rank</th>
+                        <tr className="bg-white/5 border-b border-white/10">
+                          <th className="text-left py-4 px-6 text-gray-300 font-bold text-sm uppercase tracking-wider">
+                            Rank
+                          </th>
+                          <th className="text-left py-4 px-6 text-gray-300 font-bold text-sm uppercase tracking-wider">
+                            Team
+                          </th>
+                          <th className="text-center py-4 px-6 text-gray-300 font-bold text-sm uppercase tracking-wider">
+                            Points
+                          </th>
+                          <th className="text-center py-4 px-6 text-gray-300 font-bold text-sm uppercase tracking-wider">
+                            Matches
+                          </th>
+                          <th className="text-center py-4 px-6 text-gray-300 font-bold text-sm uppercase tracking-wider">
+                            Kills
+                          </th>
+                          <th className="text-center py-4 px-6 text-gray-300 font-bold text-sm uppercase tracking-wider">
+                            WWCD
+                          </th>
+                          <th className="text-center py-4 px-6 text-gray-300 font-bold text-sm uppercase tracking-wider">
+                            Avg Rank
+                          </th>
                         </tr>
                       </thead>
                       <tbody>
                         {teamStats.map((team, index) => (
                           <tr
                             key={team.team_id}
-                            className="border-b border-gray-700/50 hover:bg-white/5 transition-colors"
+                            className="border-b border-white/5 hover:bg-white/5 transition-all duration-200"
                           >
-                            <td className="py-4 px-4">
-                              <div className="flex items-center gap-2">
+                            <td className="py-6 px-6">
+                              <div className="flex items-center gap-3">
                                 {index < 3 && (
-                                  <Crown
-                                    className={`w-4 h-4 ${
+                                  <div
+                                    className={`w-8 h-8 rounded-xl flex items-center justify-center ${
                                       index === 0
-                                        ? "text-yellow-400"
+                                        ? "bg-gradient-to-br from-yellow-400 to-yellow-500"
                                         : index === 1
-                                          ? "text-gray-400"
-                                          : "text-orange-400"
+                                          ? "bg-gradient-to-br from-gray-400 to-gray-500"
+                                          : "bg-gradient-to-br from-orange-400 to-orange-500"
                                     }`}
-                                  />
+                                  >
+                                    <Crown className="w-4 h-4 text-white" />
+                                  </div>
                                 )}
-                                <span className="text-white font-semibold">#{index + 1}</span>
+                                <span className="text-white font-bold text-lg">#{index + 1}</span>
                               </div>
                             </td>
-                            <td className="py-4 px-4">
-                              <div className="flex items-center gap-3">
+                            <td className="py-6 px-6">
+                              <div className="flex items-center gap-4">
                                 {team.team_logo_url ? (
                                   <img
                                     src={team.team_logo_url || "/placeholder.svg"}
                                     alt="Team logo"
-                                    className="w-8 h-8 rounded-full object-cover"
+                                    className="w-12 h-12 rounded-2xl object-cover border-2 border-white/20"
                                   />
                                 ) : (
-                                  <div className="w-8 h-8 bg-gradient-to-br from-cyan-400 to-green-500 rounded-full flex items-center justify-center">
-                                    <Trophy className="w-4 h-4 text-white" />
+                                  <div className="w-12 h-12 bg-gradient-to-br from-blue-400 to-teal-500 rounded-2xl flex items-center justify-center">
+                                    <Trophy className="w-6 h-6 text-white" />
                                   </div>
                                 )}
-                                <span className="text-white font-medium">{team.team_name}</span>
+                                <span className="text-white font-bold text-lg">{team.team_name}</span>
                               </div>
                             </td>
-                            <td className="py-4 px-4 text-center">
-                              <span className="text-cyan-400 font-bold text-lg">{team.total_points}</span>
+                            <td className="py-6 px-6 text-center">
+                              <div className="bg-gradient-to-r from-blue-500/20 to-teal-500/20 rounded-xl px-4 py-2 inline-block">
+                                <span className="text-blue-300 font-bold text-xl">{team.total_points}</span>
+                              </div>
                             </td>
-                            <td className="py-4 px-4 text-center">
-                              <span className="text-gray-300">{team.total_matches}</span>
+                            <td className="py-6 px-6 text-center">
+                              <span className="text-gray-300 font-medium text-lg">{team.total_matches}</span>
                             </td>
-                            <td className="py-4 px-4 text-center">
-                              <span className="text-green-400 font-semibold">{team.total_kills}</span>
+                            <td className="py-6 px-6 text-center">
+                              <div className="bg-gradient-to-r from-green-500/20 to-emerald-500/20 rounded-xl px-4 py-2 inline-block">
+                                <span className="text-green-300 font-bold text-lg">{team.total_kills}</span>
+                              </div>
                             </td>
-                            <td className="py-4 px-4 text-center">
+                            <td className="py-6 px-6 text-center">
                               <Badge
-                                variant="secondary"
-                                className={`${
+                                className={`px-4 py-2 rounded-xl font-bold ${
                                   team.wwcd_count > 0
-                                    ? "bg-yellow-900/50 text-yellow-300"
-                                    : "bg-gray-700/50 text-gray-400"
+                                    ? "bg-gradient-to-r from-yellow-500/20 to-orange-500/20 text-yellow-300 border border-yellow-500/30"
+                                    : "bg-white/5 text-gray-400 border border-white/10"
                                 }`}
                               >
                                 {team.wwcd_count}
                               </Badge>
                             </td>
-                            <td className="py-4 px-4 text-center">
-                              <span className="text-blue-400 font-semibold">{team.avg_placement.toFixed(1)}</span>
+                            <td className="py-6 px-6 text-center">
+                              <span className="text-purple-300 font-bold text-lg">{team.avg_placement.toFixed(1)}</span>
                             </td>
                           </tr>
                         ))}
@@ -636,67 +700,92 @@ export default function StatsPage() {
             </Card>
           )}
 
-          {/* Top Fraggers */}
           {activeTab === "kills" && (
-            <Card className="bg-gradient-to-br from-blue-900/90 to-teal-900/90 border-gray-700 rounded-3xl">
-              <CardHeader>
-                <CardTitle className="text-2xl text-white flex items-center gap-2">
-                  <Target className="w-6 h-6 text-red-400" />
-                  Top Fraggers
+            <Card className="bg-white/5 backdrop-blur-md border border-white/10 rounded-3xl shadow-2xl overflow-hidden">
+              <div className="bg-gradient-to-r from-red-600/20 via-orange-600/20 to-yellow-600/20 p-6">
+                <CardTitle className="text-3xl font-bold text-white flex items-center gap-3">
+                  <div className="w-12 h-12 bg-gradient-to-br from-red-500 to-orange-500 rounded-2xl flex items-center justify-center shadow-lg">
+                    <Target className="w-6 h-6 text-white" />
+                  </div>
+                  Top Fraggers Leaderboard
                 </CardTitle>
-              </CardHeader>
-              <CardContent>
+                <p className="text-gray-300 mt-2">Individual player kill statistics and performance metrics</p>
+              </div>
+              <CardContent className="p-0">
                 {playerStats.length === 0 ? (
-                  <div className="text-center py-8">
-                    <Target className="w-16 h-16 text-gray-500 mx-auto mb-4" />
-                    <h3 className="text-xl font-semibold text-white mb-2">Player Stats Coming Soon</h3>
-                    <p className="text-gray-400">Individual player statistics will be available after matches begin</p>
+                  <div className="text-center py-16">
+                    <div className="w-20 h-20 bg-gradient-to-br from-gray-600 to-gray-700 rounded-3xl flex items-center justify-center mx-auto mb-6">
+                      <Target className="w-10 h-10 text-gray-400" />
+                    </div>
+                    <h3 className="text-2xl font-bold text-white mb-3">Player Stats Coming Soon</h3>
+                    <p className="text-gray-400 text-lg">Individual statistics will be available after matches begin</p>
                   </div>
                 ) : (
                   <div className="overflow-x-auto">
                     <table className="w-full">
                       <thead>
-                        <tr className="border-b border-gray-600">
-                          <th className="text-left py-3 px-4 text-gray-300 font-semibold">Rank</th>
-                          <th className="text-left py-3 px-4 text-gray-300 font-semibold">Player</th>
-                          <th className="text-left py-3 px-4 text-gray-300 font-semibold">Team</th>
-                          <th className="text-center py-3 px-4 text-gray-300 font-semibold">Total Kills</th>
-                          <th className="text-center py-3 px-4 text-gray-300 font-semibold">Avg/Match</th>
+                        <tr className="bg-white/5 border-b border-white/10">
+                          <th className="text-left py-4 px-6 text-gray-300 font-bold text-sm uppercase tracking-wider">
+                            Rank
+                          </th>
+                          <th className="text-left py-4 px-6 text-gray-300 font-bold text-sm uppercase tracking-wider">
+                            Player
+                          </th>
+                          <th className="text-left py-4 px-6 text-gray-300 font-bold text-sm uppercase tracking-wider">
+                            Team
+                          </th>
+                          <th className="text-center py-4 px-6 text-gray-300 font-bold text-sm uppercase tracking-wider">
+                            Total Kills
+                          </th>
+                          <th className="text-center py-4 px-6 text-gray-300 font-bold text-sm uppercase tracking-wider">
+                            Avg/Match
+                          </th>
                         </tr>
                       </thead>
                       <tbody>
                         {playerStats.map((player, index) => (
                           <tr
                             key={player.player_id}
-                            className="border-b border-gray-700/50 hover:bg-white/5 transition-colors"
+                            className="border-b border-white/5 hover:bg-white/5 transition-all duration-200"
                           >
-                            <td className="py-4 px-4">
-                              <div className="flex items-center gap-2">
+                            <td className="py-6 px-6">
+                              <div className="flex items-center gap-3">
                                 {index < 3 && (
-                                  <Zap
-                                    className={`w-4 h-4 ${
+                                  <div
+                                    className={`w-8 h-8 rounded-xl flex items-center justify-center ${
                                       index === 0
-                                        ? "text-yellow-400"
+                                        ? "bg-gradient-to-br from-yellow-400 to-yellow-500"
                                         : index === 1
-                                          ? "text-gray-400"
-                                          : "text-orange-400"
+                                          ? "bg-gradient-to-br from-gray-400 to-gray-500"
+                                          : "bg-gradient-to-br from-orange-400 to-orange-500"
                                     }`}
-                                  />
+                                  >
+                                    <Zap className="w-4 h-4 text-white" />
+                                  </div>
                                 )}
-                                <span className="text-white font-semibold">#{index + 1}</span>
+                                <span className="text-white font-bold text-lg">#{index + 1}</span>
                               </div>
                             </td>
-                            <td className="py-4 px-4">
-                              <span className="text-white font-medium">{player.player_name}</span>
+                            <td className="py-6 px-6">
+                              <div className="flex items-center gap-3">
+                                <div className="w-10 h-10 bg-gradient-to-br from-purple-400 to-pink-500 rounded-2xl flex items-center justify-center">
+                                  <User className="w-5 h-5 text-white" />
+                                </div>
+                                <span className="text-white font-bold text-lg">{player.player_name}</span>
+                              </div>
                             </td>
-                            <td className="py-4 px-4">
-                              <span className="text-gray-300">{player.team_name}</span>
+                            <td className="py-6 px-6">
+                              <span className="text-gray-300 font-medium">{player.team_name}</span>
                             </td>
-                            <td className="py-4 px-4 text-center">
-                              <span className="text-red-400 font-bold text-lg">{player.total_kills}</span>
+                            <td className="py-6 px-6 text-center">
+                              <div className="bg-gradient-to-r from-red-500/20 to-orange-500/20 rounded-xl px-4 py-2 inline-block">
+                                <span className="text-red-300 font-bold text-xl">{player.total_kills}</span>
+                              </div>
                             </td>
-                            <td className="py-4 px-4 text-center">
-                              <span className="text-green-400 font-semibold">{player.avg_kills.toFixed(1)}</span>
+                            <td className="py-6 px-6 text-center">
+                              <div className="bg-gradient-to-r from-green-500/20 to-emerald-500/20 rounded-xl px-4 py-2 inline-block">
+                                <span className="text-green-300 font-bold text-lg">{player.avg_kills.toFixed(1)}</span>
+                              </div>
                             </td>
                           </tr>
                         ))}

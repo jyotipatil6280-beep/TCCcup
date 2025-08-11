@@ -12,7 +12,6 @@ import {
   Trophy,
   Plus,
   Play,
-  Pause,
   CheckCircle,
   Users,
   Target,
@@ -21,6 +20,9 @@ import {
   Shield,
   ArrowLeft,
   Trash2,
+  Activity,
+  BarChart3,
+  Clock,
 } from "lucide-react"
 import { supabase } from "../../lib/supabase"
 
@@ -402,7 +404,13 @@ export default function AdminPanel() {
   if (!authenticated || loading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-900 via-teal-800 to-green-800 flex items-center justify-center">
-        <div className="text-white">Loading...</div>
+        <Card className="bg-white/5 backdrop-blur-md border border-white/10 rounded-3xl p-8 text-center max-w-md">
+          <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-teal-500 rounded-2xl flex items-center justify-center mx-auto mb-4 animate-pulse">
+            <Shield className="w-8 h-8 text-white" />
+          </div>
+          <h3 className="text-xl font-semibold text-white mb-2">Loading Admin Panel</h3>
+          <p className="text-gray-400">Authenticating and fetching data...</p>
+        </Card>
       </div>
     )
   }
@@ -542,23 +550,21 @@ export default function AdminPanel() {
   // Main Admin Panel View
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-900 via-teal-800 to-green-800">
-      {/* Header */}
-      <div className="bg-gradient-to-r from-blue-900/95 to-teal-900/95 backdrop-blur-sm border-b border-gray-700 sticky top-0 z-50">
-        <div className="container mx-auto px-4 py-4">
+      <div className="bg-white/5 backdrop-blur-md border-b border-white/10 sticky top-0 z-50">
+        <div className="container mx-auto px-4 py-6">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-gradient-to-r from-orange-500 to-red-500 rounded-full flex items-center justify-center">
-                <Shield className="w-5 h-5 text-white" />
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 bg-gradient-to-br from-orange-500 to-red-500 rounded-2xl flex items-center justify-center shadow-lg">
+                <Shield className="w-6 h-6 text-white" />
               </div>
               <div>
-                <h1 className="text-xl font-bold text-white">TCC Admin Panel</h1>
-                <p className="text-gray-400 text-sm">Tournament Management System</p>
+                <h1 className="text-2xl font-bold text-white">TCC Admin Dashboard</h1>
+                <p className="text-gray-300">Tournament Management & Control Center</p>
               </div>
             </div>
             <Button
               onClick={handleLogout}
-              variant="outline"
-              className="border-red-500 text-red-400 hover:bg-red-900/20 bg-transparent"
+              className="bg-white/10 backdrop-blur-md border border-red-500/30 text-red-300 hover:bg-red-500/20 rounded-2xl px-6 py-3 transition-all duration-300"
             >
               <LogOut className="w-4 h-4 mr-2" />
               Logout
@@ -568,156 +574,163 @@ export default function AdminPanel() {
       </div>
 
       <div className="container mx-auto px-4 py-8">
-        {/* Stats Overview */}
-        <div className="grid md:grid-cols-4 gap-6 mb-8">
-          <Card className="bg-gradient-to-br from-blue-800/50 to-teal-800/50 border border-cyan-500/30 rounded-2xl">
+        <div className="grid md:grid-cols-4 gap-6 mb-12">
+          <Card className="bg-white/5 backdrop-blur-md border border-white/10 rounded-3xl hover:bg-white/10 transition-all duration-300 transform hover:scale-105 shadow-2xl">
             <CardContent className="p-6 text-center">
-              <Users className="w-8 h-8 text-cyan-400 mx-auto mb-2" />
-              <h3 className="text-2xl font-bold text-white">{teams.length}</h3>
-              <p className="text-gray-300 text-sm">Approved Teams</p>
+              <div className="w-16 h-16 bg-gradient-to-br from-blue-400 to-cyan-500 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">
+                <Users className="w-8 h-8 text-white" />
+              </div>
+              <h3 className="text-3xl font-bold text-white mb-1">{teams.length}</h3>
+              <p className="text-gray-300 font-medium">Approved Teams</p>
             </CardContent>
           </Card>
 
-          <Card className="bg-gradient-to-br from-green-800/50 to-emerald-800/50 border border-green-500/30 rounded-2xl">
+          <Card className="bg-white/5 backdrop-blur-md border border-white/10 rounded-3xl hover:bg-white/10 transition-all duration-300 transform hover:scale-105 shadow-2xl">
             <CardContent className="p-6 text-center">
-              <Trophy className="w-8 h-8 text-green-400 mx-auto mb-2" />
-              <h3 className="text-2xl font-bold text-white">{matches.length}</h3>
-              <p className="text-gray-300 text-sm">Total Matches</p>
+              <div className="w-16 h-16 bg-gradient-to-br from-green-400 to-emerald-500 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">
+                <Trophy className="w-8 h-8 text-white" />
+              </div>
+              <h3 className="text-3xl font-bold text-white mb-1">{matches.length}</h3>
+              <p className="text-gray-300 font-medium">Total Matches</p>
             </CardContent>
           </Card>
 
-          <Card className="bg-gradient-to-br from-blue-800/50 to-purple-800/50 border border-blue-500/30 rounded-2xl">
+          <Card className="bg-white/5 backdrop-blur-md border border-white/10 rounded-3xl hover:bg-white/10 transition-all duration-300 transform hover:scale-105 shadow-2xl">
             <CardContent className="p-6 text-center">
-              <Play className="w-8 h-8 text-blue-400 mx-auto mb-2" />
-              <h3 className="text-2xl font-bold text-white">{matches.filter((m) => m.status === "ongoing").length}</h3>
-              <p className="text-gray-300 text-sm">Ongoing</p>
+              <div className="w-16 h-16 bg-gradient-to-br from-purple-400 to-pink-500 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">
+                <Activity className="w-8 h-8 text-white" />
+              </div>
+              <h3 className="text-3xl font-bold text-white mb-1">
+                {matches.filter((m) => m.status === "ongoing").length}
+              </h3>
+              <p className="text-gray-300 font-medium">Live Matches</p>
             </CardContent>
           </Card>
 
-          <Card className="bg-gradient-to-br from-green-800/50 to-teal-800/50 border border-green-500/30 rounded-2xl">
+          <Card className="bg-white/5 backdrop-blur-md border border-white/10 rounded-3xl hover:bg-white/10 transition-all duration-300 transform hover:scale-105 shadow-2xl">
             <CardContent className="p-6 text-center">
-              <CheckCircle className="w-8 h-8 text-green-400 mx-auto mb-2" />
-              <h3 className="text-2xl font-bold text-white">
+              <div className="w-16 h-16 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">
+                <CheckCircle className="w-8 h-8 text-white" />
+              </div>
+              <h3 className="text-3xl font-bold text-white mb-1">
                 {matches.filter((m) => m.status === "completed").length}
               </h3>
-              <p className="text-gray-300 text-sm">Completed</p>
+              <p className="text-gray-300 font-medium">Completed</p>
             </CardContent>
           </Card>
         </div>
 
-        {/* Main Content */}
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="grid w-full grid-cols-2 bg-blue-900/50 rounded-2xl p-1">
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-8">
+          <TabsList className="grid w-full grid-cols-2 bg-white/5 backdrop-blur-md rounded-3xl p-2 border border-white/10">
             <TabsTrigger
               value="matches"
-              className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-cyan-500 data-[state=active]:to-green-500 data-[state=active]:text-white rounded-xl"
+              className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-500 data-[state=active]:via-purple-500 data-[state=active]:to-teal-500 data-[state=active]:text-white rounded-2xl py-3 px-6 font-medium transition-all duration-300"
             >
-              <Trophy className="w-4 h-4 mr-2" />
+              <BarChart3 className="w-5 h-5 mr-2" />
               Match Management
             </TabsTrigger>
             <TabsTrigger
               value="create"
-              className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-cyan-500 data-[state=active]:to-green-500 data-[state=active]:text-white rounded-xl"
+              className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-green-500 data-[state=active]:via-emerald-500 data-[state=active]:to-teal-500 data-[state=active]:text-white rounded-2xl py-3 px-6 font-medium transition-all duration-300"
             >
-              <Plus className="w-4 h-4 mr-2" />
+              <Plus className="w-5 h-5 mr-2" />
               Create Match
             </TabsTrigger>
           </TabsList>
 
-          {/* Match Management Tab */}
           <TabsContent value="matches" className="space-y-6">
-            <Card className="bg-gradient-to-br from-blue-900/90 to-teal-900/90 border-gray-700 rounded-3xl">
-              <CardHeader>
-                <CardTitle className="text-white">Tournament Matches</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
+            <Card className="bg-white/5 backdrop-blur-md border border-white/10 rounded-3xl shadow-2xl overflow-hidden">
+              <div className="bg-gradient-to-r from-blue-600/20 via-purple-600/20 to-teal-600/20 p-6">
+                <CardTitle className="text-3xl font-bold text-white flex items-center gap-3">
+                  <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-500 rounded-2xl flex items-center justify-center shadow-lg">
+                    <Trophy className="w-6 h-6 text-white" />
+                  </div>
+                  Tournament Matches
+                </CardTitle>
+                <p className="text-gray-300 mt-2">Manage and monitor all tournament matches</p>
+              </div>
+              <CardContent className="p-6">
+                <div className="space-y-6">
                   {matches.length === 0 ? (
-                    <div className="text-center py-8">
-                      <Trophy className="w-16 h-16 text-gray-500 mx-auto mb-4" />
-                      <p className="text-gray-400">No matches created yet. Create your first match!</p>
+                    <div className="text-center py-16">
+                      <div className="w-20 h-20 bg-gradient-to-br from-gray-600 to-gray-700 rounded-3xl flex items-center justify-center mx-auto mb-6">
+                        <Trophy className="w-10 h-10 text-gray-400" />
+                      </div>
+                      <h3 className="text-2xl font-bold text-white mb-3">No Matches Created</h3>
+                      <p className="text-gray-400 text-lg">Create your first tournament match to get started</p>
                     </div>
                   ) : (
                     matches.map((match) => (
-                      <div key={match.id} className="p-6 bg-blue-800/30 rounded-2xl border border-cyan-500/20">
-                        <div className="flex items-center justify-between mb-4">
-                          <div className="flex items-center gap-4">
-                            <div className="w-12 h-12 bg-gradient-to-br from-cyan-400 to-green-500 rounded-full flex items-center justify-center">
-                              <span className="text-white font-bold">{match.match_number}</span>
-                            </div>
-                            <div>
-                              <h3 className="text-white font-semibold text-lg">Match {match.match_number}</h3>
-                              <div className="flex items-center gap-4 mt-1">
-                                <div className="flex items-center gap-1">
-                                  <Map className="w-4 h-4 text-gray-400" />
-                                  <span className="text-gray-300">{match.map_name}</span>
-                                </div>
-                                <div className="flex items-center gap-1">
-                                  <Users className="w-4 h-4 text-gray-400" />
-                                  <span className="text-gray-300">{match.teams?.length || 0} teams</span>
+                      <Card
+                        key={match.id}
+                        className="bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl hover:bg-white/10 transition-all duration-300 shadow-lg"
+                      >
+                        <CardContent className="p-6">
+                          <div className="flex items-center justify-between mb-6">
+                            <div className="flex items-center gap-4">
+                              <div className="w-16 h-16 bg-gradient-to-br from-blue-500 via-purple-500 to-teal-500 rounded-2xl flex items-center justify-center shadow-lg">
+                                <span className="text-white font-bold text-xl">{match.match_number}</span>
+                              </div>
+                              <div>
+                                <h3 className="text-white font-bold text-xl">Match {match.match_number}</h3>
+                                <div className="flex items-center gap-6 mt-2">
+                                  <div className="flex items-center gap-2">
+                                    <Map className="w-4 h-4 text-blue-400" />
+                                    <span className="text-gray-300 font-medium">{match.map_name}</span>
+                                  </div>
+                                  <div className="flex items-center gap-2">
+                                    <Users className="w-4 h-4 text-green-400" />
+                                    <span className="text-gray-300 font-medium">{match.teams?.length || 0} teams</span>
+                                  </div>
+                                  <div className="flex items-center gap-2">
+                                    <Clock className="w-4 h-4 text-purple-400" />
+                                    <span className="text-gray-300 font-medium">
+                                      {new Date(match.created_at).toLocaleDateString()}
+                                    </span>
+                                  </div>
                                 </div>
                               </div>
                             </div>
+                            <div className="flex items-center gap-3">
+                              <Badge className={`px-4 py-2 rounded-xl font-bold ${getStatusColor(match.status)}`}>
+                                {match.status.toUpperCase()}
+                              </Badge>
+                            </div>
                           </div>
-                          <div className="flex items-center gap-3">
-                            <Badge className={getStatusColor(match.status)}>{match.status}</Badge>
-                          </div>
-                        </div>
 
-                        <div className="flex items-center gap-3">
-                          {match.status === "scheduled" && (
-                            <>
+                          <div className="flex items-center gap-4">
+                            {match.status === "scheduled" && (
                               <Button
                                 onClick={() => updateMatchStatus(match.id, "ongoing")}
-                                className="bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white rounded-xl"
+                                className="bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white rounded-2xl px-6 py-3 font-medium transition-all duration-300 transform hover:scale-105"
                               >
                                 <Play className="w-4 h-4 mr-2" />
                                 Start Match
                               </Button>
-                            </>
-                          )}
+                            )}
 
-                          {/* Always show delete button for scheduled and completed matches */}
-                          {(match.status === "scheduled" || match.status === "completed") && (
-                            <Button
-                              onClick={() => deleteMatch(match.id)}
-                              variant="outline"
-                              className="border-red-500 text-red-400 hover:bg-red-900/20 bg-transparent rounded-xl"
-                            >
-                              <Trash2 className="w-4 h-4 mr-2" />
-                              Delete
-                            </Button>
-                          )}
+                            {(match.status === "scheduled" || match.status === "completed") && (
+                              <Button
+                                onClick={() => deleteMatch(match.id)}
+                                className="bg-white/10 backdrop-blur-md border border-red-500/30 text-red-300 hover:bg-red-500/20 rounded-2xl px-6 py-3 font-medium transition-all duration-300"
+                              >
+                                <Trash2 className="w-4 h-4 mr-2" />
+                                Delete
+                              </Button>
+                            )}
 
-                          {match.status === "ongoing" && (
-                            <>
+                            {match.status === "ongoing" && (
                               <Button
                                 onClick={() => openPointsManagement(match)}
-                                className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white rounded-xl"
+                                className="bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white rounded-2xl px-6 py-3 font-medium transition-all duration-300 transform hover:scale-105"
                               >
                                 <Target className="w-4 h-4 mr-2" />
                                 Manage Points
                               </Button>
-
-                              <Button
-                                onClick={() => updateMatchStatus(match.id, "scheduled")}
-                                variant="outline"
-                                className="border-yellow-500 text-yellow-400 hover:bg-yellow-900/20 bg-transparent rounded-xl"
-                              >
-                                <Pause className="w-4 h-4 mr-2" />
-                                Pause
-                              </Button>
-                            </>
-                          )}
-
-                          {match.status === "completed" && (
-                            <div className="flex items-center gap-2">
-                              <CheckCircle className="w-5 h-5 text-green-400" />
-                              <span className="text-green-300 font-semibold">Match Completed</span>
-                            </div>
-                          )}
-                        </div>
-                      </div>
+                            )}
+                          </div>
+                        </CardContent>
+                      </Card>
                     ))
                   )}
                 </div>
@@ -725,33 +738,38 @@ export default function AdminPanel() {
             </Card>
           </TabsContent>
 
-          {/* Create Match Tab */}
           <TabsContent value="create" className="space-y-6">
-            <Card className="bg-gradient-to-br from-blue-900/90 to-teal-900/90 border-gray-700 rounded-3xl">
-              <CardHeader>
-                <CardTitle className="text-white">Create New Match</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                <div className="grid md:grid-cols-2 gap-6">
+            <Card className="bg-white/5 backdrop-blur-md border border-white/10 rounded-3xl shadow-2xl overflow-hidden">
+              <div className="bg-gradient-to-r from-green-600/20 via-emerald-600/20 to-teal-600/20 p-6">
+                <CardTitle className="text-3xl font-bold text-white flex items-center gap-3">
+                  <div className="w-12 h-12 bg-gradient-to-br from-green-500 to-emerald-500 rounded-2xl flex items-center justify-center shadow-lg">
+                    <Plus className="w-6 h-6 text-white" />
+                  </div>
+                  Create New Match
+                </CardTitle>
+                <p className="text-gray-300 mt-2">Set up a new tournament match with teams and configuration</p>
+              </div>
+              <CardContent className="p-8 space-y-8">
+                <div className="grid md:grid-cols-2 gap-8">
                   <div>
-                    <Label className="text-gray-300 mb-2 block">Match Number</Label>
+                    <Label className="text-gray-300 mb-3 block font-medium text-lg">Match Number</Label>
                     <Input
                       type="number"
                       value={newMatch.match_number}
                       onChange={(e) => setNewMatch({ ...newMatch, match_number: e.target.value })}
                       placeholder="Enter match number"
-                      className="bg-blue-900/50 border-gray-600 text-white placeholder-gray-400 rounded-xl"
+                      className="bg-white/5 backdrop-blur-md border border-white/10 text-white placeholder-gray-400 rounded-2xl py-3 px-4 text-lg focus:border-blue-400/50 transition-all duration-300"
                     />
                   </div>
 
                   <div>
-                    <Label className="text-gray-300 mb-2 block">Map</Label>
+                    <Label className="text-gray-300 mb-3 block font-medium text-lg">Map Selection</Label>
                     <Select
                       value={newMatch.map_name}
                       onValueChange={(value) => setNewMatch({ ...newMatch, map_name: value })}
                     >
-                      <SelectTrigger className="bg-blue-900/50 border-gray-600 text-white rounded-xl">
-                        <SelectValue placeholder="Select map" />
+                      <SelectTrigger className="bg-white/5 backdrop-blur-md border border-white/10 text-white rounded-2xl py-3 px-4 text-lg">
+                        <SelectValue placeholder="Select tournament map" />
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="RONDO">RONDO</SelectItem>
@@ -763,63 +781,79 @@ export default function AdminPanel() {
                 </div>
 
                 <div>
-                  <Label className="text-gray-300 mb-3 block">Select Teams</Label>
+                  <Label className="text-gray-300 mb-4 block font-medium text-lg">Select Participating Teams</Label>
                   {teams.length === 0 ? (
-                    <div className="text-center py-8 bg-blue-800/20 rounded-xl">
-                      <Users className="w-12 h-12 text-gray-500 mx-auto mb-2" />
-                      <p className="text-gray-400">No approved teams available</p>
-                    </div>
+                    <Card className="bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl p-8 text-center">
+                      <div className="w-16 h-16 bg-gradient-to-br from-gray-600 to-gray-700 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                        <Users className="w-8 h-8 text-gray-400" />
+                      </div>
+                      <h3 className="text-xl font-bold text-white mb-2">No Teams Available</h3>
+                      <p className="text-gray-400">No approved teams found for tournament participation</p>
+                    </Card>
                   ) : (
-                    <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-3 max-h-60 overflow-y-auto">
-                      {teams.map((team) => (
-                        <div
-                          key={team.id}
-                          className={`p-3 rounded-xl border cursor-pointer transition-all ${
-                            newMatch.selected_teams.includes(team.id)
-                              ? "bg-cyan-900/50 border-cyan-500 text-cyan-300"
-                              : "bg-blue-800/30 border-gray-600 text-gray-300 hover:border-cyan-500/50"
-                          }`}
-                          onClick={() => {
-                            const isSelected = newMatch.selected_teams.includes(team.id)
-                            setNewMatch({
-                              ...newMatch,
-                              selected_teams: isSelected
-                                ? newMatch.selected_teams.filter((id) => id !== team.id)
-                                : [...newMatch.selected_teams, team.id],
-                            })
-                          }}
-                        >
-                          <div className="flex items-center gap-2">
-                            {team.team_logo_url ? (
-                              <img
-                                src={team.team_logo_url || "/placeholder.svg"}
-                                alt="Team logo"
-                                className="w-8 h-8 rounded-full object-cover"
-                              />
-                            ) : (
-                              <div className="w-8 h-8 bg-gradient-to-br from-cyan-400 to-green-500 rounded-full flex items-center justify-center">
-                                <Trophy className="w-4 h-4 text-white" />
+                    <div className="space-y-4">
+                      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4 max-h-80 overflow-y-auto p-2">
+                        {teams.map((team) => (
+                          <Card
+                            key={team.id}
+                            className={`cursor-pointer transition-all duration-300 transform hover:scale-105 ${
+                              newMatch.selected_teams.includes(team.id)
+                                ? "bg-gradient-to-r from-blue-500/20 to-teal-500/20 border border-blue-400/50 shadow-lg"
+                                : "bg-white/5 backdrop-blur-md border border-white/10 hover:bg-white/10"
+                            } rounded-2xl`}
+                            onClick={() => {
+                              const isSelected = newMatch.selected_teams.includes(team.id)
+                              setNewMatch({
+                                ...newMatch,
+                                selected_teams: isSelected
+                                  ? newMatch.selected_teams.filter((id) => id !== team.id)
+                                  : [...newMatch.selected_teams, team.id],
+                              })
+                            }}
+                          >
+                            <CardContent className="p-4">
+                              <div className="flex items-center gap-3">
+                                {team.team_logo_url ? (
+                                  <img
+                                    src={team.team_logo_url || "/placeholder.svg"}
+                                    alt="Team logo"
+                                    className="w-12 h-12 rounded-2xl object-cover border-2 border-white/20"
+                                  />
+                                ) : (
+                                  <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-teal-500 rounded-2xl flex items-center justify-center">
+                                    <Trophy className="w-6 h-6 text-white" />
+                                  </div>
+                                )}
+                                <div className="flex-1">
+                                  <span className="font-bold text-white block">{team.team_name}</span>
+                                  <span className="text-sm text-gray-400">{team.players.length} players</span>
+                                </div>
+                                {newMatch.selected_teams.includes(team.id) && (
+                                  <CheckCircle className="w-5 h-5 text-blue-400" />
+                                )}
                               </div>
-                            )}
-                            <div>
-                              <span className="font-medium block">{team.team_name}</span>
-                              <span className="text-xs text-gray-400">{team.players.length} players</span>
-                            </div>
-                          </div>
-                        </div>
-                      ))}
+                            </CardContent>
+                          </Card>
+                        ))}
+                      </div>
+                      <div className="bg-white/5 backdrop-blur-md rounded-2xl p-4 border border-white/10">
+                        <p className="text-gray-300 font-medium">
+                          Selected Teams:{" "}
+                          <span className="text-blue-400 font-bold">{newMatch.selected_teams.length}</span> /{" "}
+                          {teams.length}
+                        </p>
+                      </div>
                     </div>
                   )}
-                  <p className="text-gray-400 text-sm mt-2">Selected: {newMatch.selected_teams.length} teams</p>
                 </div>
 
                 <Button
                   onClick={createMatch}
                   disabled={teams.length === 0}
-                  className="w-full bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white font-bold py-3 rounded-xl disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="w-full bg-gradient-to-r from-green-500 via-emerald-500 to-teal-500 hover:from-green-600 hover:via-emerald-600 hover:to-teal-600 text-white font-bold py-4 rounded-2xl text-lg disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 transform hover:scale-105 shadow-xl"
                 >
-                  <Plus className="w-5 h-5 mr-2" />
-                  Create Match
+                  <Plus className="w-6 h-6 mr-3" />
+                  Create Tournament Match
                 </Button>
               </CardContent>
             </Card>
