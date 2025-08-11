@@ -3,14 +3,70 @@
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
-import { Trophy, ChefHatIcon, Calendar, Award, ArrowRight, BarChart3 } from "lucide-react"
+import { Trophy, ChefHatIcon, Calendar, Award, ArrowRight, BarChart3, Clock } from "lucide-react"
 import PageLayout from "../components/page-layout"
+import { useState, useEffect } from "react"
 
 const YouTubeIcon = ({ className }: { className?: string }) => (
   <svg viewBox="0 0 24 24" fill="currentColor" className={className}>
     <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93-.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z" />
   </svg>
 )
+
+const CountdownTimer = () => {
+  const [timeLeft, setTimeLeft] = useState({
+    hours: 0,
+    minutes: 0,
+    seconds: 0,
+  })
+
+  useEffect(() => {
+    const calculateTimeLeft = () => {
+      const today = new Date()
+      today.setHours(19, 30, 0, 0) // 7:30 PM today
+
+      // Convert to IST (UTC+5:30)
+      const istOffset = 5.5 * 60 * 60 * 1000 // IST offset in milliseconds
+      const now = new Date()
+      const istNow = new Date(now.getTime() + istOffset)
+      const istTarget = new Date(today.getTime() + istOffset)
+
+      const difference = istTarget.getTime() - istNow.getTime()
+
+      if (difference > 0) {
+        const hours = Math.floor(difference / (1000 * 60 * 60))
+        const minutes = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60))
+        const seconds = Math.floor((difference % (1000 * 60)) / 1000)
+
+        setTimeLeft({ hours, minutes, seconds })
+      } else {
+        setTimeLeft({ hours: 0, minutes: 0, seconds: 0 })
+      }
+    }
+
+    calculateTimeLeft()
+    const timer = setInterval(calculateTimeLeft, 1000)
+
+    return () => clearInterval(timer)
+  }, [])
+
+  return (
+    <div className="flex justify-center gap-3 mb-6">
+      <div className="bg-gradient-to-br from-blue-800/70 to-teal-800/70 rounded-lg p-3 min-w-[60px] text-center border border-cyan-500/30">
+        <div className="text-xl md:text-2xl font-bold text-cyan-300">{String(timeLeft.hours).padStart(2, "0")}</div>
+        <div className="text-xs text-gray-400">Hours</div>
+      </div>
+      <div className="bg-gradient-to-br from-blue-800/70 to-teal-800/70 rounded-lg p-3 min-w-[60px] text-center border border-cyan-500/30">
+        <div className="text-xl md:text-2xl font-bold text-green-300">{String(timeLeft.minutes).padStart(2, "0")}</div>
+        <div className="text-xs text-gray-400">Minutes</div>
+      </div>
+      <div className="bg-gradient-to-br from-blue-800/70 to-teal-800/70 rounded-lg p-3 min-w-[60px] text-center border border-cyan-500/30">
+        <div className="text-xl md:text-2xl font-bold text-yellow-300">{String(timeLeft.seconds).padStart(2, "0")}</div>
+        <div className="text-xs text-gray-400">Seconds</div>
+      </div>
+    </div>
+  )
+}
 
 export default function HomePage() {
   return (
@@ -37,11 +93,7 @@ export default function HomePage() {
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             {/* LIVE Button */}
-            <Link
-              href="https://www.youtube.com/watch?v=IKVtR2zpMog"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
+            <Link href="https://www.youtube.com/watch?v=IKVtR2zpMog" target="_blank" rel="noopener noreferrer">
               <Button
                 variant="link"
                 className="bg-gradient-to-r from-blue-600 via-teal-600 to-green-600 hover:from-blue-700 hover:via-teal-700 hover:to-green-700 text-white rounded-2xl text-base shadow-lg py-2.5 transition-all duration-300 transform hover:scale-105 font-semibold px-4"
@@ -111,19 +163,20 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* CTA Section */}
       <section className="py-16 px-4">
         <div className="container mx-auto">
           <Card className="bg-gradient-to-r from-blue-900/90 to-teal-900/90 border border-cyan-500/30 rounded-3xl">
-            <CardContent className="p-12 text-center">
-              <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">Registration Period Ended</h2>
-              <p className="text-xl text-gray-300 mb-8">
-                Thank you to all teams who registered! Tournament matches are now underway.
-              </p>
+            <CardContent className="p-8 text-center">
+              <div className="flex items-center justify-center gap-3 mb-4">
+                <Clock className="w-6 h-6 text-cyan-400" />
+                <h2 className="text-2xl md:text-3xl font-bold text-white">DAY 2 STARTS IN</h2>
+              </div>
+              <p className="text-lg text-gray-300 mb-6">Today at 7:30 PM IST - Don't miss the action!</p>
+              <CountdownTimer />
               <Link href="/teams">
-                <Button className="bg-gradient-to-r from-cyan-500 to-green-500 hover:from-cyan-600 hover:to-green-600 text-white font-bold py-4 px-8 rounded-2xl text-lg transition-all duration-300 transform hover:scale-105">
+                <Button className="bg-gradient-to-r from-cyan-500 to-green-500 hover:from-cyan-600 hover:to-green-600 text-white font-bold py-3 px-6 rounded-2xl text-base transition-all duration-300 transform hover:scale-105">
                   View Registered Teams
-                  <ArrowRight className="w-5 h-5 ml-2" />
+                  <ArrowRight className="w-4 h-4 ml-2" />
                 </Button>
               </Link>
             </CardContent>
