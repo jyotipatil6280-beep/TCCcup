@@ -56,6 +56,7 @@ export default function StatsPage() {
   const [activeTab, setActiveTab] = useState("overall")
   const [teamStats, setTeamStats] = useState<TeamStats[]>([])
   const [playerStats, setPlayerStats] = useState<PlayerStats[]>([])
+  const [allPlayerStats, setAllPlayerStats] = useState<PlayerStats[]>([])
   const [allMatches, setAllMatches] = useState<MatchDetail[]>([]) // Stores all completed matches for dropdown
   const [selectedMatchIdForStandings, setSelectedMatchIdForStandings] = useState<string | null>(null) // Stores selected match ID
   const [loading, setLoading] = useState(true)
@@ -239,16 +240,16 @@ export default function StatsPage() {
         }
       })
 
-      // Calculate average kills and sort, then slice to top 10
-      const finalPlayerStats = Object.values(playerStatsLookup)
+      const completePlayerStats = Object.values(playerStatsLookup)
         .map((player) => ({
           ...player,
           avg_kills: player.matches_played > 0 ? player.total_kills / player.matches_played : 0,
         }))
         .sort((a, b) => b.total_kills - a.total_kills)
-        .slice(0, 10) // Limit to top 10 players
 
-      setPlayerStats(finalPlayerStats)
+      setAllPlayerStats(completePlayerStats)
+
+      setPlayerStats(completePlayerStats.slice(0, 10))
     } catch (error) {
       console.error("Error processing player stats:", error)
     }
@@ -730,7 +731,7 @@ export default function StatsPage() {
                     className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 w-full"
                   >
                     {teamStats.map((team) => {
-                      const teamPlayers = playerStats.filter((player) => player.team_id === team.team_id)
+                      const teamPlayers = allPlayerStats.filter((player) => player.team_id === team.team_id)
                       return (
                         <AccordionItem key={team.team_id} value={`team-${team.team_id}`} className="border-none">
                           <AccordionTrigger className="flex items-center justify-between p-4 bg-gray-800/50 hover:bg-gray-700/50 rounded-xl">
