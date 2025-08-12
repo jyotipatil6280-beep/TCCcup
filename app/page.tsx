@@ -73,51 +73,91 @@ export default function HomePage() {
     <PageLayout>
       {/* Hero Section */}
       <section className="relative py-20 px-4">
-        <div className="container mx-auto text-center">
-          <div className="mb-8">
-            <img
-              src="https://i.ibb.co/jkVCpXPv/TCC-LOGO.png"
-              alt="Twitter Community Cup Logo"
-              className="w-32 h-24 mx-auto mb-6 object-contain"
-            />
-          </div>
+        <div className="container mx-auto">
+          <div className="grid lg:grid-cols-2 gap-12 items-center">
+            {/* Left Side - YouTube Video */}
+            <div className="order-2 lg:order-1">
+              <div className="relative bg-gradient-to-br from-gray-900/90 to-gray-800/90 rounded-2xl overflow-hidden border border-cyan-500/30 aspect-video">
+                {/* YouTube Embed Placeholder */}
+                {/* <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-blue-900/50 to-teal-900/50">
+                  <div className="text-center">
+                    <YouTubeIcon className="w-16 h-16 text-cyan-400 mx-auto mb-4" />
+                    <p className="text-gray-300 text-lg font-medium">Tournament Stream</p>
+                    <p className="text-gray-400 text-sm">Live stream will appear here</p>
+                  </div>
+                </div> */}
+                {/* When you have the YouTube link, replace the above div with: */}
+                <iframe
+                  className="w-full h-full"
+                  src="https://www.youtube.com/embed/IKVtR2zpMog?start=8"
+                  title="Tournament Stream"
+                  frameBorder="0"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                />
+              </div>
+            </div>
 
-          <h1 className="text-5xl md:text-7xl font-bold bg-gradient-to-r from-cyan-300 via-green-400 to-emerald-400 bg-clip-text text-transparent mb-6">
-            Twitter Community Cup
-          </h1>
+            {/* Right Side - Tournament Info */}
+            <div className="order-1 lg:order-2 text-center lg:text-left">
+              {/* Tournament Logo */}
+              <div className="mb-6 lg:mb-8">
+                <img
+                  src="https://i.ibb.co/jkVCpXPv/TCC-LOGO.png"
+                  alt="Twitter Community Cup Logo"
+                  className="w-24 h-18 lg:w-32 lg:h-24 mx-auto lg:mx-0 object-contain hover:scale-110 transition-transform duration-300"
+                />
+              </div>
 
-          <p className="text-lg text-gray-400 mb-8 max-w-2xl mx-auto">
-            Join the ultimate BGMI tournament experience. Compete with the best teams, showcase your skills, and win
-            amazing prizes.
-          </p>
+              {/* Get Ready Text */}
+              <div className="mb-4">
+                <p className="text-cyan-400 font-semibold text-sm lg:text-base tracking-wider uppercase">
+                  Get Ready for Glory
+                </p>
+              </div>
 
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            {/* LIVE Button */}
-            <Link href="https://www.youtube.com/watch?v=IKVtR2zpMog" target="_blank" rel="noopener noreferrer">
-              <Button
-                variant="link"
-                className="bg-gradient-to-r from-blue-600 via-teal-600 to-green-600 hover:from-blue-700 hover:via-teal-700 hover:to-green-700 text-white rounded-2xl text-base shadow-lg py-2.5 transition-all duration-300 transform hover:scale-105 font-semibold px-4"
-              >
-                <div className="flex items-center gap-3">
-                  <YouTubeIcon className="w-5 h-5 text-white" />
-                  <span className="flex items-center gap-1">
-                    <span className="w-2 h-2 bg-green-300 rounded-full animate-pulse"></span>
-                    LIVE
-                  </span>
-                </div>
-              </Button>
-            </Link>
+              {/* Main Title */}
+              <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6">
+                <span className="text-white">Twitter Community</span>
+                <br />
+                <span className="bg-gradient-to-r from-cyan-300 via-green-400 to-emerald-400 bg-clip-text text-transparent">
+                  Cup Season 1
+                </span>
+              </h1>
 
-            {/* Stats Button */}
-            <Link href="/stats">
-              <Button
-                variant="outline"
-                className="border-cyan-400 text-cyan-300 hover:bg-cyan-400/10 py-4 px-8 rounded-2xl text-lg bg-transparent"
-              >
-                <BarChart3 className="w-5 h-5 mr-2" />
-                View Stats
-              </Button>
-            </Link>
+              {/* Description */}
+              <p className="text-lg lg:text-xl text-gray-300 mb-8 max-w-lg mx-auto lg:mx-0 leading-relaxed">
+                Prepare for the most intense gaming showdown of the year. Compete, conquer, and claim your victory in
+                the ultimate BGMI tournament experience.
+              </p>
+
+              {/* Action Buttons */}
+              <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
+                {/* LIVE Button */}
+                <Link href="https://www.youtube.com/watch?v=IKVtR2zpMog" target="_blank" rel="noopener noreferrer">
+                  <Button className="bg-gradient-to-r from-blue-600 via-teal-600 to-green-600 hover:from-blue-700 hover:via-teal-700 hover:to-green-700 text-white rounded-2xl text-base shadow-lg py-3 px-6 transition-all duration-300 transform hover:scale-105 hover:-translate-y-1 font-semibold">
+                    <div className="flex items-center gap-3">
+                      <YouTubeIcon className="w-5 h-5 text-white" />
+                      <span className="flex items-center gap-2">
+                        <span className="w-2 h-2 bg-green-300 rounded-full animate-pulse"></span>
+                        LIVE
+                      </span>
+                    </div>
+                  </Button>
+                </Link>
+
+                {/* Stats Button */}
+                <Link href="/stats">
+                  <Button
+                    variant="outline"
+                    className="border-2 border-cyan-400 text-cyan-300 hover:bg-cyan-400/10 hover:border-cyan-300 py-3 px-6 rounded-2xl text-base bg-transparent transition-all duration-300 transform hover:scale-105 hover:-translate-y-1 font-semibold"
+                  >
+                    <BarChart3 className="w-5 h-5 mr-2" />
+                    View Stats
+                  </Button>
+                </Link>
+              </div>
+            </div>
           </div>
         </div>
       </section>

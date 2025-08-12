@@ -22,6 +22,8 @@ interface TeamStats {
   wwcd_count: number
   avg_placement: number
   best_placement: number
+  position_change?: number // +3 means moved up 3 positions, -2 means dropped 2 positions
+  previous_position?: number
 }
 
 interface PlayerStats {
@@ -50,6 +52,7 @@ const MAP_IMAGES: { [key: string]: string } = {
   Sanhok: "/images/sanhok.webp",
   Erangel: "/images/erangel.webp",
   Miramar: "/images/miramar.webp",
+  RONDO: "/images/rondo.jpg",
 }
 
 export default function StatsPage() {
@@ -87,12 +90,16 @@ export default function StatsPage() {
 
   const fetchTeamStats = async () => {
     try {
-      // Get all match results
+      // Get all match results with match information
       const { data: allResults, error: allResultsError } = await supabase.from("match_results").select(`
         team_id,
         placement,
         total_kills,
-        points
+        points,
+        match_id,
+        matches (
+          match_number
+        )
       `)
 
       if (allResultsError) {
@@ -126,7 +133,56 @@ export default function StatsPage() {
         teamsLookup[team.id] = team
       })
 
-      // Process team statistics
+      const matchNumbers = [...new Set(allResults.map((r) => r.matches?.match_number))].sort((a, b) => a - b)
+      let previousStandings: { [key: number]: number } = {} // team_id -> position
+      const positionChanges: { [key: number]: number } = {} // team_id -> change
+
+      // Process each match to track position changes
+      for (const matchNumber of matchNumbers) {
+        const matchResults = allResults.filter((r) => r.matches?.match_number === matchNumber)
+
+        // Calculate cumulative points up to this match
+        const cumulativeStats: { [key: number]: { points: number; team_id: number } } = {}
+
+        allResults
+          .filter((r) => r.matches?.match_number <= matchNumber)
+          .forEach((result) => {
+            const teamId = result.team_id
+            if (!cumulativeStats[teamId]) {
+              cumulativeStats[teamId] = { points: 0, team_id: teamId }
+            }
+            cumulativeStats[teamId].points += result.points
+          })
+
+        // Sort teams by cumulative points to get current standings
+        const currentStandings = Object.values(cumulativeStats)
+          .sort((a, b) => b.points - a.points)
+          .reduce(
+            (acc, team, index) => {
+              acc[team.team_id] = index + 1 // position (1-based)
+              return acc
+            },
+            {} as { [key: number]: number },
+          )
+
+        // Calculate position changes from previous match
+        if (Object.keys(previousStandings).length > 0) {
+          Object.keys(currentStandings).forEach((teamIdStr) => {
+            const teamId = Number.parseInt(teamIdStr)
+            const currentPos = currentStandings[teamId]
+            const previousPos = previousStandings[teamId]
+
+            if (previousPos !== undefined) {
+              // Positive change means moved up (lower position number)
+              positionChanges[teamId] = previousPos - currentPos
+            }
+          })
+        }
+
+        previousStandings = { ...currentStandings }
+      }
+
+      // Process team statistics with position changes
       const teamStatsLookup: { [key: number]: TeamStats } = {}
 
       allResults?.forEach((result: any) => {
@@ -155,6 +211,8 @@ export default function StatsPage() {
             wwcd_count: result.placement === 1 ? 1 : 0,
             avg_placement: result.placement,
             best_placement: result.placement,
+            position_change: positionChanges[teamId] || 0,
+            previous_position: previousStandings[teamId],
           }
         }
       })
@@ -409,13 +467,15 @@ export default function StatsPage() {
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
                 variant={activeTab === tab.id ? "default" : "outline"}
-                className={`flex items-center gap-2 px-4 py-2 rounded-xl transition-all duration-200 ${
+                className={`flex items-center gap-2 px-4 py-2 rounded-xl transition-all duration-300 transform hover:scale-105 hover:-translate-y-1 hover:shadow-lg ${
                   activeTab === tab.id
-                    ? "bg-gradient-to-r from-cyan-500 to-green-500 text-white border-none"
-                    : "bg-transparent border-cyan-400 text-cyan-300 hover:bg-cyan-400/10"
+                    ? "bg-gradient-to-r from-cyan-500 to-green-500 text-white border-none shadow-lg scale-105 -translate-y-1"
+                    : "bg-transparent border-cyan-400 text-cyan-300 hover:bg-cyan-400/10 hover:border-cyan-300 hover:shadow-cyan-400/20"
                 }`}
               >
-                <Icon className="w-4 h-4" />
+                <Icon
+                  className={`w-4 h-4 transition-transform duration-300 ${activeTab === tab.id ? "" : "group-hover:rotate-12"}`}
+                />
                 {tab.label}
               </Button>
             )
@@ -451,19 +511,20 @@ export default function StatsPage() {
                           <th className="text-center py-3 px-4 text-gray-300 font-semibold">Kills</th>
                           <th className="text-center py-3 px-4 text-gray-300 font-semibold">WWCD</th>
                           <th className="text-center py-3 px-4 text-gray-300 font-semibold">Avg Rank</th>
+                          <th className="text-center py-3 px-4 text-gray-300 font-semibold">Change</th>
                         </tr>
                       </thead>
                       <tbody>
                         {teamStats.map((team, index) => (
                           <tr
                             key={team.team_id}
-                            className="border-b border-gray-700/50 hover:bg-white/5 transition-colors"
+                            className="border-b border-gray-700/50 hover:bg-gradient-to-r hover:from-white/5 hover:to-cyan-500/5 transition-all duration-300 hover:scale-[1.01] hover:shadow-sm group"
                           >
                             <td className="py-4 px-4">
                               <div className="flex items-center gap-2">
                                 {index < 3 && (
                                   <Crown
-                                    className={`w-4 h-4 ${
+                                    className={`w-4 h-4 transition-transform duration-300 group-hover:scale-110 ${
                                       index === 0
                                         ? "text-yellow-400"
                                         : index === 1
@@ -514,6 +575,25 @@ export default function StatsPage() {
                             </td>
                             <td className="py-4 px-4 text-center">
                               <span className="text-blue-400 font-semibold">{team.avg_placement.toFixed(1)}</span>
+                            </td>
+                            <td className="py-4 px-4 text-center">
+                              {team.position_change !== undefined && team.position_change !== 0 ? (
+                                <div className="flex items-center justify-center gap-1">
+                                  {team.position_change > 0 ? (
+                                    <>
+                                      <div className="w-0 h-0 border-l-[4px] border-r-[4px] border-b-[6px] border-l-transparent border-r-transparent border-b-green-400"></div>
+                                      <span className="text-green-400 font-bold text-sm">+{team.position_change}</span>
+                                    </>
+                                  ) : (
+                                    <>
+                                      <div className="w-0 h-0 border-l-[4px] border-r-[4px] border-t-[6px] border-l-transparent border-r-transparent border-t-red-400"></div>
+                                      <span className="text-red-400 font-bold text-sm">{team.position_change}</span>
+                                    </>
+                                  )}
+                                </div>
+                              ) : (
+                                <span className="text-gray-500 text-sm">-</span>
+                              )}
                             </td>
                           </tr>
                         ))}
@@ -591,13 +671,17 @@ export default function StatsPage() {
                             {selectedMatch.teams.map((team, index) => (
                               <tr
                                 key={team.team_name}
-                                className="border-b border-gray-700/50 hover:bg-white/5 transition-colors"
+                                className="border-b border-gray-700/50 hover:bg-gradient-to-r hover:from-white/5 hover:to-cyan-500/5 transition-all duration-300 hover:scale-[1.01] hover:shadow-sm group"
                               >
                                 <td className="py-4 px-4">
-                                  <span className="text-white font-semibold">#{index + 1}</span>
+                                  <span className="text-white font-semibold transition-colors duration-300 group-hover:text-cyan-300">
+                                    #{index + 1}
+                                  </span>
                                 </td>
                                 <td className="py-4 px-4">
-                                  <span className="text-white font-medium">{team.team_name}</span>
+                                  <span className="text-white font-medium transition-colors duration-300 group-hover:text-cyan-300">
+                                    {team.team_name}
+                                  </span>
                                 </td>
                                 <td className="py-4 px-4 text-center">
                                   <Badge
@@ -668,13 +752,13 @@ export default function StatsPage() {
                         {playerStats.map((player, index) => (
                           <tr
                             key={player.player_id}
-                            className="border-b border-gray-700/50 hover:bg-white/5 transition-colors"
+                            className="border-b border-gray-700/50 hover:bg-gradient-to-r hover:from-white/5 hover:to-cyan-500/5 transition-all duration-300 hover:scale-[1.01] hover:shadow-sm group"
                           >
                             <td className="py-4 px-4">
                               <div className="flex items-center gap-2">
                                 {index < 3 && (
                                   <Zap
-                                    className={`w-4 h-4 ${
+                                    className={`w-4 h-4 transition-transform duration-300 group-hover:scale-110 ${
                                       index === 0
                                         ? "text-yellow-400"
                                         : index === 1
@@ -734,16 +818,16 @@ export default function StatsPage() {
                       const teamPlayers = allPlayerStats.filter((player) => player.team_id === team.team_id)
                       return (
                         <AccordionItem key={team.team_id} value={`team-${team.team_id}`} className="border-none">
-                          <AccordionTrigger className="flex items-center justify-between p-4 bg-gray-800/50 hover:bg-gray-700/50 rounded-xl">
+                          <AccordionTrigger className="flex items-center justify-between p-4 bg-gray-800/50 hover:bg-gray-700/50 rounded-xl transition-all duration-300 transform hover:scale-[1.02] hover:-translate-y-1 hover:shadow-lg hover:shadow-cyan-500/10 group">
                             <div className="flex items-center gap-3">
                               {team.team_logo_url ? (
                                 <img
                                   src={team.team_logo_url || "/placeholder.svg"}
                                   alt={`${team.team_name} logo`}
-                                  className="w-10 h-10 rounded-full object-cover"
+                                  className="w-10 h-10 rounded-full object-cover transition-transform duration-300 group-hover:scale-110 group-hover:rotate-3"
                                 />
                               ) : (
-                                <div className="w-10 h-10 bg-gradient-to-br from-cyan-400 to-green-500 rounded-full flex items-center justify-center">
+                                <div className="w-10 h-10 bg-gradient-to-br from-cyan-400 to-green-500 rounded-full flex items-center justify-center transition-transform duration-300 group-hover:scale-110 group-hover:rotate-3">
                                   <Trophy className="w-5 h-5 text-white" />
                                 </div>
                               )}

@@ -23,10 +23,16 @@ export default function Navbar() {
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
-          <Link href="/" className="flex items-center space-x-3">
-            <img src="https://i.ibb.co/jkVCpXPv/TCC-LOGO.png" alt="TCC Logo" className="h-10 w-10 object-contain" />
+          <Link href="/" className="flex items-center space-x-3 group">
+            <img
+              src="https://i.ibb.co/jkVCpXPv/TCC-LOGO.png"
+              alt="TCC Logo"
+              className="h-10 w-10 object-contain transition-transform duration-300 group-hover:scale-110 group-hover:rotate-3"
+            />
             <div className="text-white">
-              <div className="text-lg font-extrabold tracking-wide text-cyan-300">{"TCC | UGC"}</div>
+              <div className="text-lg font-extrabold tracking-wide text-cyan-300 transition-all duration-300 group-hover:text-cyan-200">
+                {"TCC | UGC"}
+              </div>
             </div>
           </Link>
 
@@ -37,17 +43,18 @@ export default function Navbar() {
               const isActive = pathname === item.href
               return (
                 <Link key={item.name} href={item.href}>
-                  <Button
-                    variant="ghost"
-                    className={`flex items-center space-x-2 px-4 py-2 rounded-xl transition-all duration-200 ${
+                  <div
+                    className={`flex items-center space-x-2 px-4 py-2 rounded-xl transition-all duration-300 transform hover:scale-105 hover:-translate-y-1 hover:shadow-lg hover:shadow-cyan-500/20 cursor-pointer ${
                       isActive
-                        ? "bg-gradient-to-r from-cyan-500/20 to-green-500/20 text-cyan-300 border border-cyan-500/30"
-                        : "text-gray-300 hover:text-white hover:bg-white/10"
+                        ? "bg-gradient-to-r from-cyan-500/20 to-green-500/20 text-cyan-300 border border-cyan-500/30 shadow-md"
+                        : "text-gray-300 hover:text-cyan-300 hover:bg-gradient-to-r hover:from-cyan-500/10 hover:to-teal-500/10"
                     }`}
                   >
-                    <Icon className="w-4 h-4" />
-                    <span>{item.name}</span>
-                  </Button>
+                    <Icon
+                      className={`w-4 h-4 transition-transform duration-300 ${isActive ? "" : "hover:rotate-12"}`}
+                    />
+                    <span className="font-medium">{item.name}</span>
+                  </div>
                 </Link>
               )
             })}
@@ -55,7 +62,12 @@ export default function Navbar() {
 
           {/* Mobile menu button */}
           <div className="md:hidden">
-            <Button variant="ghost" size="sm" onClick={() => setMobileMenuOpen(!mobileMenuOpen)} className="text-white">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              className="text-white transition-all duration-300 hover:scale-110 hover:rotate-180 hover:!bg-cyan-500/10 hover:!text-cyan-300"
+            >
               {mobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
             </Button>
           </div>
@@ -63,24 +75,24 @@ export default function Navbar() {
 
         {/* Mobile Navigation */}
         {mobileMenuOpen && (
-          <div className="md:hidden py-4 border-t border-gray-700">
+          <div className="md:hidden py-4 border-t border-gray-700 animate-in slide-in-from-top-2 duration-300">
             <div className="flex flex-col space-y-2">
-              {navigation.map((item) => {
+              {navigation.map((item, index) => {
                 const Icon = item.icon
                 const isActive = pathname === item.href
                 return (
                   <Link key={item.name} href={item.href} onClick={() => setMobileMenuOpen(false)}>
-                    <Button
-                      variant="ghost"
-                      className={`w-full justify-start flex items-center space-x-2 px-4 py-3 rounded-xl transition-all duration-200 ${
+                    <div
+                      style={{ animationDelay: `${index * 50}ms` }}
+                      className={`w-full justify-start flex items-center space-x-2 px-4 py-3 rounded-xl transition-all duration-300 transform hover:scale-[1.02] hover:translate-x-2 animate-in slide-in-from-left-4 cursor-pointer ${
                         isActive
                           ? "bg-gradient-to-r from-cyan-500/20 to-green-500/20 text-cyan-300 border border-cyan-500/30"
-                          : "text-gray-300 hover:text-white hover:bg-white/10"
+                          : "text-gray-300 hover:text-cyan-300 hover:bg-gradient-to-r hover:from-cyan-500/10 hover:to-teal-500/10"
                       }`}
                     >
-                      <Icon className="w-4 h-4" />
-                      <span>{item.name}</span>
-                    </Button>
+                      <Icon className="w-4 h-4 transition-transform duration-300 hover:rotate-12" />
+                      <span className="font-medium">{item.name}</span>
+                    </div>
                   </Link>
                 )
               })}
