@@ -152,6 +152,10 @@ export default function RulesPage() {
               <p>• Toxic behavior or inappropriate language</p>
               <p>• Stream sniping or ghosting</p>
               <p>• Account sharing or using multiple accounts</p>
+              <p className="text-red-400 font-semibold">
+                • <strong>Self revive is strictly prohibited</strong> - Using self revive in any match will result in
+                deduction of all match points for that match
+              </p>
               <p className="text-orange-300 font-semibold">
                 Violation of any rule will result in immediate disqualification
               </p>
