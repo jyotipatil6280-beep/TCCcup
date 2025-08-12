@@ -89,7 +89,7 @@ export default function HomePage() {
                 {/* When you have the YouTube link, replace the above div with: */}
                 <iframe
                   className="w-full h-full"
-                  src="https://www.youtube.com/embed/IKVtR2zpMog?start=8"
+                  src="https://www.youtube.com/embed/jw-Fv3z0Bjc"
                   title="Tournament Stream"
                   frameBorder="0"
                   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
@@ -134,7 +134,7 @@ export default function HomePage() {
               {/* Action Buttons */}
               <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
                 {/* LIVE Button */}
-                <Link href="https://www.youtube.com/watch?v=IKVtR2zpMog" target="_blank" rel="noopener noreferrer">
+                <Link href="https://www.youtube.com/live/jw-Fv3z0Bjc" target="_blank" rel="noopener noreferrer">
                   <Button className="bg-gradient-to-r from-blue-600 via-teal-600 to-green-600 hover:from-blue-700 hover:via-teal-700 hover:to-green-700 text-white rounded-2xl text-base shadow-lg py-3 px-6 transition-all duration-300 transform hover:scale-105 hover:-translate-y-1 font-semibold">
                     <div className="flex items-center gap-3">
                       <YouTubeIcon className="w-5 h-5 text-white" />
