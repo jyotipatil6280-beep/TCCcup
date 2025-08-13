@@ -65,6 +65,10 @@ export default function StatsPage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
+  const [smashTarget, setSmashTarget] = useState<number>(152) // Target score is 152 (142 + 10)
+  const [smashQualifiedTeams, setSmashQualifiedTeams] = useState<Set<number>>(new Set())
+  const [tournamentWinner, setTournamentWinner] = useState<TeamStats | null>(null)
+
   useEffect(() => {
     fetchStats()
     const handleStatsUpdate = () => {
@@ -225,6 +229,23 @@ export default function StatsPage() {
         }))
         .sort((a, b) => b.total_points - a.total_points)
 
+      const newQualifiedTeams = new Set<number>()
+      let winner: TeamStats | null = null
+
+      finalStats.forEach((team) => {
+        // Check if team has reached the smash target
+        if (team.total_points >= smashTarget) {
+          newQualifiedTeams.add(team.team_id)
+
+          // Check if this qualified team has a WWCD (and wasn't already qualified in the same match they hit target)
+          if (team.wwcd_count > 0 && !winner) {
+            winner = team
+          }
+        }
+      })
+
+      setSmashQualifiedTeams(newQualifiedTeams)
+      setTournamentWinner(winner)
       setTeamStats(finalStats)
     } catch (error) {
       console.error("Error processing team stats:", error)
@@ -233,24 +254,54 @@ export default function StatsPage() {
 
   const fetchPlayerStats = async () => {
     try {
-      // Get all player kills data
-      const { data: allPlayerKills, error: allKillsError } = await supabase.from("player_match_kills").select(`
-        player_id,
-        kills
-      `)
+      console.log("=== DEBUGGING PLAYER STATS ===")
 
-      if (allKillsError) {
-        console.log("Player match kills not available yet:", allKillsError.message)
+      const { data: playerKillsData, error: killsError } = await supabase
+        .from("player_match_kills")
+        .select(`
+          match_id,
+          player_id,
+          kills,
+          team_id
+        `)
+        .order("match_id")
+
+      if (killsError) {
+        console.error("Error fetching player kills:", killsError)
         return
       }
 
-      // Corrected check: only check allPlayerKills for data presence
-      if (!allPlayerKills || allPlayerKills.length === 0) {
-        console.log("No player kill data available yet")
+      console.log(`Found ${playerKillsData?.length || 0} player kill records`)
+
+      const targetMatchIds = [21, 22, 23]
+      console.log("Looking for kill data in matches:", targetMatchIds)
+
+      if (playerKillsData) {
+        targetMatchIds.forEach((matchId) => {
+          const killsInMatch = playerKillsData.filter((k) => k.match_id === matchId)
+          console.log(`Match ID ${matchId}: Found ${killsInMatch.length} player kill records`)
+          killsInMatch.forEach((kill) => {
+            console.log(`  - Player ${kill.player_id} got ${kill.kills} kills`)
+          })
+        })
+      }
+
+      // Get all completed matches
+      const { data: completedMatches, error: matchesError } = await supabase
+        .from("matches")
+        .select("id, match_number")
+        .eq("status", "completed")
+        .order("match_number")
+
+      if (matchesError) {
+        console.error("Error fetching completed matches:", matchesError)
         return
       }
 
-      // Get all players with team information separately
+      const totalCompletedMatches = completedMatches?.length || 0
+      console.log(`Total completed matches: ${totalCompletedMatches}`)
+
+      // Get all players with team information
       const { data: playersData, error: playersError } = await supabase.from("players").select(`
         id,
         player_name,
@@ -265,6 +316,8 @@ export default function StatsPage() {
         return
       }
 
+      console.log(`Found ${playersData?.length || 0} players`)
+
       // Create a lookup object for player data
       const playersLookup: { [key: number]: any } = {}
       playersData?.forEach((player) => {
@@ -272,41 +325,68 @@ export default function StatsPage() {
       })
 
       // Process player statistics
-      const playerStatsLookup: { [key: number]: PlayerStats } = {}
+      const playerStatsLookup: { [key: number]: PlayerStats & { matchIds: Set<number> } } = {}
 
-      allPlayerKills?.forEach((kill: any) => {
-        const playerId = kill.player_id
+      // Initialize all players with zero stats
+      playersData?.forEach((player) => {
+        playerStatsLookup[player.id] = {
+          player_id: player.id,
+          player_name: player.player_name,
+          team_name: player.teams?.team_name || "Unknown Team",
+          team_id: player.team_id,
+          total_kills: 0,
+          matches_played: 0,
+          avg_kills: 0,
+          matchIds: new Set<number>(),
+        }
+      })
+
+      playerKillsData?.forEach((killRecord: any) => {
+        const playerId = killRecord.player_id
+        const kills = killRecord.kills || 0
+        const matchId = killRecord.match_id
+
         const playerInfo = playersLookup[playerId]
+        if (playerInfo) {
+          const existing = playerStatsLookup[playerId]
+          if (existing) {
+            existing.total_kills += kills
+            existing.matchIds.add(matchId)
 
-        if (!playerInfo) return // Skip if player not found
-
-        const existing = playerStatsLookup[playerId]
-
-        if (existing) {
-          existing.total_kills += kill.kills
-          existing.matches_played += 1
-        } else {
-          playerStatsLookup[playerId] = {
-            player_id: playerId,
-            player_name: playerInfo.player_name,
-            team_name: playerInfo.teams?.team_name || "Unknown Team",
-            team_id: playerInfo.team_id, // Include team_id
-            total_kills: kill.kills,
-            matches_played: 1,
-            avg_kills: 0,
+            if (targetMatchIds.includes(matchId)) {
+              console.log(`✓ Player ${existing.player_name} got ${kills} kills in match ID ${matchId}`)
+            }
           }
         }
       })
 
+      // Debug: Show total kills for top players
+      const topKillers = Object.values(playerStatsLookup)
+        .sort((a, b) => b.total_kills - a.total_kills)
+        .slice(0, 5)
+
+      console.log("Top 5 killers after processing:")
+      topKillers.forEach((player) => {
+        console.log(`${player.player_name}: ${player.total_kills} kills across ${player.matchIds.size} matches`)
+      })
+
+      // Finalize stats with proper match counting
       const completePlayerStats = Object.values(playerStatsLookup)
         .map((player) => ({
-          ...player,
-          avg_kills: player.matches_played > 0 ? player.total_kills / player.matches_played : 0,
+          player_id: player.player_id,
+          player_name: player.player_name,
+          team_name: player.team_name,
+          team_id: player.team_id,
+          total_kills: player.total_kills,
+          matches_played: totalCompletedMatches,
+          avg_kills: totalCompletedMatches > 0 ? player.total_kills / totalCompletedMatches : 0,
         }))
         .sort((a, b) => b.total_kills - a.total_kills)
 
-      setAllPlayerStats(completePlayerStats)
+      console.log(`Final stats: ${completePlayerStats.length} players with ${totalCompletedMatches} matches each`)
+      console.log("=== END DEBUGGING ===")
 
+      setAllPlayerStats(completePlayerStats)
       setPlayerStats(completePlayerStats.slice(0, 10))
     } catch (error) {
       console.error("Error processing player stats:", error)
@@ -490,7 +570,27 @@ export default function StatsPage() {
                 <CardTitle className="text-2xl text-white flex items-center gap-2">
                   <Trophy className="w-6 h-6 text-cyan-400" />
                   Overall Tournament Standings
+                  <div className="ml-auto flex items-center gap-2">
+                    <Badge variant="secondary" className="bg-yellow-900/50 text-yellow-300 px-3 py-1">
+                      <Target className="w-4 h-4 mr-1" />
+                      Smash Target: {smashTarget}
+                    </Badge>
+                  </div>
                 </CardTitle>
+                {tournamentWinner && (
+                  <div className="bg-gradient-to-r from-yellow-500/20 to-orange-500/20 border border-yellow-500/30 rounded-xl p-4 mt-4">
+                    <div className="flex items-center gap-3">
+                      <Crown className="w-8 h-8 text-yellow-400" />
+                      <div>
+                        <h3 className="text-xl font-bold text-yellow-300">🏆 TOURNAMENT WINNERS! 🏆</h3>
+                        <p className="text-white">
+                          <span className="font-bold">{tournamentWinner.team_name}</span> has achieved victory with{" "}
+                          {tournamentWinner.total_points} points and {tournamentWinner.wwcd_count} WWCD!
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                )}
               </CardHeader>
               <CardContent>
                 {teamStats.length === 0 ? (
@@ -515,88 +615,118 @@ export default function StatsPage() {
                         </tr>
                       </thead>
                       <tbody>
-                        {teamStats.map((team, index) => (
-                          <tr
-                            key={team.team_id}
-                            className="border-b border-gray-700/50 hover:bg-gradient-to-r hover:from-white/5 hover:to-cyan-500/5 transition-all duration-300 hover:scale-[1.01] hover:shadow-sm group"
-                          >
-                            <td className="py-4 px-4">
-                              <div className="flex items-center gap-2">
-                                {index < 3 && (
-                                  <Crown
-                                    className={`w-4 h-4 transition-transform duration-300 group-hover:scale-110 ${
-                                      index === 0
-                                        ? "text-yellow-400"
-                                        : index === 1
-                                          ? "text-gray-400"
-                                          : "text-orange-400"
-                                    }`}
-                                  />
-                                )}
-                                <span className="text-white font-semibold">#{index + 1}</span>
-                              </div>
-                            </td>
-                            <td className="py-4 px-4">
-                              <div className="flex items-center gap-3">
-                                {team.team_logo_url ? (
-                                  <img
-                                    src={team.team_logo_url || "/placeholder.svg"}
-                                    alt="Team logo"
-                                    className="w-8 h-8 rounded-full object-cover"
-                                  />
-                                ) : (
-                                  <div className="w-8 h-8 bg-gradient-to-br from-cyan-400 to-green-500 rounded-full flex items-center justify-center">
-                                    <Trophy className="w-4 h-4 text-white" />
-                                  </div>
-                                )}
-                                <span className="text-white font-medium">{team.team_name}</span>
-                              </div>
-                            </td>
-                            <td className="py-4 px-4 text-center">
-                              <span className="text-cyan-400 font-bold text-lg">{team.total_points}</span>
-                            </td>
-                            <td className="py-4 px-4 text-center">
-                              <span className="text-gray-300">{team.total_matches}</span>
-                            </td>
-                            <td className="py-4 px-4 text-center">
-                              <span className="text-green-400 font-semibold">{team.total_kills}</span>
-                            </td>
-                            <td className="py-4 px-4 text-center">
-                              <Badge
-                                variant="secondary"
-                                className={`${
-                                  team.wwcd_count > 0
-                                    ? "bg-yellow-900/50 text-yellow-300"
-                                    : "bg-gray-700/50 text-gray-400"
-                                }`}
-                              >
-                                {team.wwcd_count}
-                              </Badge>
-                            </td>
-                            <td className="py-4 px-4 text-center">
-                              <span className="text-blue-400 font-semibold">{team.avg_placement.toFixed(1)}</span>
-                            </td>
-                            <td className="py-4 px-4 text-center">
-                              {team.position_change !== undefined && team.position_change !== 0 ? (
-                                <div className="flex items-center justify-center gap-1">
-                                  {team.position_change > 0 ? (
-                                    <>
-                                      <div className="w-0 h-0 border-l-[4px] border-r-[4px] border-b-[6px] border-l-transparent border-r-transparent border-b-green-400"></div>
-                                      <span className="text-green-400 font-bold text-sm">+{team.position_change}</span>
-                                    </>
-                                  ) : (
-                                    <>
-                                      <div className="w-0 h-0 border-l-[4px] border-r-[4px] border-t-[6px] border-l-transparent border-r-transparent border-t-red-400"></div>
-                                      <span className="text-red-400 font-bold text-sm">{team.position_change}</span>
-                                    </>
+                        {teamStats.map((team, index) => {
+                          const isSmashQualified = smashQualifiedTeams.has(team.team_id)
+                          const isWinner = tournamentWinner?.team_id === team.team_id
+
+                          return (
+                            <tr
+                              key={team.team_id}
+                              className={`border-b border-gray-700/50 transition-all duration-300 hover:scale-[1.01] hover:shadow-sm group ${
+                                isWinner
+                                  ? "bg-gradient-to-r from-yellow-500/20 to-orange-500/20 border-yellow-500/30 shadow-lg shadow-yellow-500/10"
+                                  : isSmashQualified
+                                    ? "bg-gradient-to-r from-yellow-500/10 to-amber-500/10 border-yellow-500/20 shadow-md shadow-yellow-500/5"
+                                    : "hover:bg-gradient-to-r hover:from-white/5 hover:to-cyan-500/5"
+                              }`}
+                            >
+                              <td className="py-4 px-4">
+                                <div className="flex items-center gap-2">
+                                  {isWinner && <Crown className="w-5 h-5 text-yellow-400 animate-pulse" />}
+                                  {index < 3 && !isWinner && (
+                                    <Crown
+                                      className={`w-4 h-4 transition-transform duration-300 group-hover:scale-110 ${
+                                        index === 0
+                                          ? "text-yellow-400"
+                                          : index === 1
+                                            ? "text-gray-400"
+                                            : "text-orange-400"
+                                      }`}
+                                    />
+                                  )}
+                                  <span className={`font-semibold ${isWinner ? "text-yellow-300" : "text-white"}`}>
+                                    #{index + 1}
+                                  </span>
+                                  {isSmashQualified && !isWinner && (
+                                    <Badge
+                                      variant="secondary"
+                                      className="bg-yellow-900/50 text-yellow-300 text-xs px-2 py-0.5"
+                                    >
+                                      QUALIFIED
+                                    </Badge>
                                   )}
                                 </div>
-                              ) : (
-                                <span className="text-gray-500 text-sm">-</span>
-                              )}
-                            </td>
-                          </tr>
-                        ))}
+                              </td>
+                              <td className="py-4 px-4">
+                                <div className="flex items-center gap-3">
+                                  {team.team_logo_url ? (
+                                    <img
+                                      src={team.team_logo_url || "/placeholder.svg"}
+                                      alt="Team logo"
+                                      className="w-8 h-8 rounded-full object-cover transition-transform duration-300 group-hover:scale-110 group-hover:rotate-3"
+                                    />
+                                  ) : (
+                                    <div className="w-8 h-8 bg-gradient-to-br from-cyan-400 to-green-500 rounded-full flex items-center justify-center transition-transform duration-300 group-hover:scale-110 group-hover:rotate-3">
+                                      <Trophy className="w-5 h-5 text-white" />
+                                    </div>
+                                  )}
+                                  <span
+                                    className={`text-white font-bold text-lg ${isWinner ? "text-yellow-300" : "text-white"}`}
+                                  >
+                                    {team.team_name}
+                                  </span>
+                                </div>
+                              </td>
+                              <td className="py-4 px-4 text-center">
+                                <span className={`font-bold text-lg ${isWinner ? "text-yellow-400" : "text-cyan-400"}`}>
+                                  {team.total_points}
+                                </span>
+                              </td>
+                              <td className="py-4 px-4 text-center">
+                                <span className="text-gray-300">{team.total_matches}</span>
+                              </td>
+                              <td className="py-4 px-4 text-center">
+                                <span className="text-green-400 font-semibold">{team.total_kills}</span>
+                              </td>
+                              <td className="py-4 px-4 text-center">
+                                <Badge
+                                  variant="secondary"
+                                  className={`${
+                                    team.wwcd_count > 0
+                                      ? "bg-yellow-900/50 text-yellow-300"
+                                      : "bg-gray-700/50 text-gray-400"
+                                  }`}
+                                >
+                                  {team.wwcd_count}
+                                </Badge>
+                              </td>
+                              <td className="py-4 px-4 text-center">
+                                <span className="text-blue-400 font-semibold">{team.avg_placement.toFixed(1)}</span>
+                              </td>
+                              <td className="py-4 px-4 text-center">
+                                {team.position_change !== undefined && team.position_change !== 0 ? (
+                                  <div className="flex items-center justify-center gap-1">
+                                    {team.position_change > 0 ? (
+                                      <>
+                                        <div className="w-0 h-0 border-l-[4px] border-r-[4px] border-b-[6px] border-l-transparent border-r-transparent border-b-green-400"></div>
+                                        <span className="text-green-400 font-bold text-sm">
+                                          +{team.position_change}
+                                        </span>
+                                      </>
+                                    ) : (
+                                      <>
+                                        <div className="w-0 h-0 border-l-[4px] border-r-[4px] border-t-[6px] border-l-transparent border-r-transparent border-t-red-400"></div>
+                                        <span className="text-red-400 font-bold text-sm">{team.position_change}</span>
+                                      </>
+                                    )}
+                                  </div>
+                                ) : (
+                                  <span className="text-gray-500 text-sm">-</span>
+                                )}
+                              </td>
+                            </tr>
+                          )
+                        })}
                       </tbody>
                     </table>
                   </div>
