@@ -582,9 +582,9 @@ export default function StatsPage() {
                     <div className="flex items-center gap-3">
                       <Crown className="w-8 h-8 text-yellow-400" />
                       <div>
-                        <h3 className="text-xl font-bold text-yellow-300">🏆SMASH ELIGIBLE🏆</h3>
+                        <h3 className="text-xl font-bold text-yellow-300">🏆TCC BGMI CUP WINNERS!!!!🏆</h3>
                         <p className="text-white">
-                          <span className="font-bold">{tournamentWinner.team_name}</span> Are Now Smash Eligible{" "}
+                          <span className="font-bold">{tournamentWinner.team_name}</span> ARE NOW WWINNERS OF TCC 2025 BGMI EDITION with{" "}
                           {tournamentWinner.total_points} points and {tournamentWinner.wwcd_count} WWCD!
                         </p>
                       </div>
