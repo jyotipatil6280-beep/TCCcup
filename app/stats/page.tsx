@@ -582,9 +582,9 @@ export default function StatsPage() {
                     <div className="flex items-center gap-3">
                       <Crown className="w-8 h-8 text-yellow-400" />
                       <div>
-                        <h3 className="text-xl font-bold text-yellow-300">🏆 TOURNAMENT WINNERS! 🏆</h3>
+                        <h3 className="text-xl font-bold text-yellow-300">🏆SMASH ELIGIBLE🏆</h3>
                         <p className="text-white">
-                          <span className="font-bold">{tournamentWinner.team_name}</span> has achieved victory with{" "}
+                          <span className="font-bold">{tournamentWinner.team_name}</span> Are Now Smash Eligible{" "}
                           {tournamentWinner.total_points} points and {tournamentWinner.wwcd_count} WWCD!
                         </p>
                       </div>

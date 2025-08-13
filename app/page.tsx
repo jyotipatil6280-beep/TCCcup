@@ -89,7 +89,7 @@ export default function HomePage() {
                 {/* When you have the YouTube link, replace the above div with: */}
                 <iframe
                   className="w-full h-full"
-                  src="https://www.youtube.com/live/d2Ju5IFOPKw"
+                  src="https://www.youtube.com/embed/jw-Fv3z0Bjc"
                   title="Tournament Stream"
                   frameBorder="0"
                   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
