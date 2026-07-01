@@ -9,7 +9,6 @@ import { Badge } from "@/components/ui/badge"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Trophy, Target, Crown, Zap, Users, TrendingUp, AlertCircle, Calendar, User, ListOrdered } from "lucide-react"
 import PageLayout from "../../components/page-layout"
-import { supabase } from "../../lib/supabase"
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
 
 interface TeamStats {
@@ -83,400 +82,49 @@ export default function StatsPage() {
   const fetchStats = async () => {
     try {
       setError(null)
-      await Promise.all([fetchTeamStats(), fetchPlayerStats(), fetchAllMatchDetails()])
-    } catch (error) {
-      console.error("Error fetching stats:", error)
-      setError("Failed to load tournament statistics. Please try again later.")
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  const fetchTeamStats = async () => {
-    try {
-      // Get all match results with match information
-      const { data: allResults, error: allResultsError } = await supabase.from("match_results").select(`
-        team_id,
-        placement,
-        total_kills,
-        points,
-        match_id,
-        matches (
-          match_number
-        )
-      `)
-
-      if (allResultsError) {
-        console.log("Match results not available yet:", allResultsError.message)
-        return
+      const response = await fetch("/api/stats")
+      
+      if (!response.ok) {
+        throw new Error(`API returned ${response.status}`)
       }
 
-      if (!allResults || allResults.length === 0) {
-        console.log("No match results available yet")
-        return
+      const data = await response.json()
+
+      if (data.error) {
+        throw new Error(data.error)
       }
 
-      // Get all teams separately
-      const { data: teamsData, error: teamsError } = await supabase
-        .from("teams")
-        .select(`
-        id,
-        team_name,
-        team_logo_url
-      `)
-        .eq("status", "approved")
+      setTeamStats(data.teamStats || [])
+      setAllPlayerStats(data.playerStats || [])
+      setPlayerStats((data.playerStats || []).slice(0, 10))
+      setAllMatches(data.allMatches || [])
 
-      if (teamsError) {
-        console.error("Error fetching teams:", teamsError)
-        return
+      if ((data.allMatches || []).length > 0 && !selectedMatchIdForStandings) {
+        setSelectedMatchIdForStandings(data.allMatches[0].id.toString())
       }
 
-      // Create a lookup object for team data
-      const teamsLookup: { [key: number]: any } = {}
-      teamsData?.forEach((team) => {
-        teamsLookup[team.id] = team
-      })
-
-      const matchNumbers = [...new Set(allResults.map((r) => r.matches?.match_number))].sort((a, b) => a - b)
-      let previousStandings: { [key: number]: number } = {} // team_id -> position
-      const positionChanges: { [key: number]: number } = {} // team_id -> change
-
-      // Process each match to track position changes
-      for (const matchNumber of matchNumbers) {
-        const matchResults = allResults.filter((r) => r.matches?.match_number === matchNumber)
-
-        // Calculate cumulative points up to this match
-        const cumulativeStats: { [key: number]: { points: number; team_id: number } } = {}
-
-        allResults
-          .filter((r) => r.matches?.match_number <= matchNumber)
-          .forEach((result) => {
-            const teamId = result.team_id
-            if (!cumulativeStats[teamId]) {
-              cumulativeStats[teamId] = { points: 0, team_id: teamId }
-            }
-            cumulativeStats[teamId].points += result.points
-          })
-
-        // Sort teams by cumulative points to get current standings
-        const currentStandings = Object.values(cumulativeStats)
-          .sort((a, b) => b.points - a.points)
-          .reduce(
-            (acc, team, index) => {
-              acc[team.team_id] = index + 1 // position (1-based)
-              return acc
-            },
-            {} as { [key: number]: number },
-          )
-
-        // Calculate position changes from previous match
-        if (Object.keys(previousStandings).length > 0) {
-          Object.keys(currentStandings).forEach((teamIdStr) => {
-            const teamId = Number.parseInt(teamIdStr)
-            const currentPos = currentStandings[teamId]
-            const previousPos = previousStandings[teamId]
-
-            if (previousPos !== undefined) {
-              // Positive change means moved up (lower position number)
-              positionChanges[teamId] = previousPos - currentPos
-            }
-          })
-        }
-
-        previousStandings = { ...currentStandings }
-      }
-
-      // Process team statistics with position changes
-      const teamStatsLookup: { [key: number]: TeamStats } = {}
-
-      allResults?.forEach((result: any) => {
-        const teamId = result.team_id
-        const teamInfo = teamsLookup[teamId]
-
-        if (!teamInfo) return // Skip if team not found
-
-        const existing = teamStatsLookup[teamId]
-
-        if (existing) {
-          existing.total_points += result.points
-          existing.total_matches += 1
-          existing.total_kills += result.total_kills
-          existing.wwcd_count += result.placement === 1 ? 1 : 0
-          existing.best_placement = Math.min(existing.best_placement, result.placement)
-          existing.avg_placement += result.placement
-        } else {
-          teamStatsLookup[teamId] = {
-            team_id: teamId,
-            team_name: teamInfo.team_name,
-            team_logo_url: teamInfo.team_logo_url,
-            total_points: result.points,
-            total_matches: 1,
-            total_kills: result.total_kills,
-            wwcd_count: result.placement === 1 ? 1 : 0,
-            avg_placement: result.placement,
-            best_placement: result.placement,
-            position_change: positionChanges[teamId] || 0,
-            previous_position: previousStandings[teamId],
-          }
-        }
-      })
-
-      // Calculate average placement and sort by points
-      const finalStats = Object.values(teamStatsLookup)
-        .map((team) => ({
-          ...team,
-          avg_placement: team.total_matches > 0 ? team.avg_placement / team.total_matches : 0,
-        }))
-        .sort((a, b) => b.total_points - a.total_points)
-
+      // Calculate smash qualified teams
+      const smashTarget = 152
       const newQualifiedTeams = new Set<number>()
       let winner: TeamStats | null = null
 
-      finalStats.forEach((team) => {
-        // Check if team has reached the smash target
+      ;(data.teamStats || []).forEach((team: TeamStats) => {
         if (team.total_points >= smashTarget) {
           newQualifiedTeams.add(team.team_id)
-
-          // Check if this qualified team has a WWCD (and wasn't already qualified in the same match they hit target)
           if (team.wwcd_count > 0 && !winner) {
             winner = team
           }
         }
       })
 
+      setSmashTarget(smashTarget)
       setSmashQualifiedTeams(newQualifiedTeams)
       setTournamentWinner(winner)
-      setTeamStats(finalStats)
     } catch (error) {
-      console.error("Error processing team stats:", error)
-    }
-  }
-
-  const fetchPlayerStats = async () => {
-    try {
-      console.log("=== DEBUGGING PLAYER STATS ===")
-
-      const { data: playerKillsData, error: killsError } = await supabase
-        .from("player_match_kills")
-        .select(`
-          match_id,
-          player_id,
-          kills,
-          team_id
-        `)
-        .order("match_id")
-
-      if (killsError) {
-        console.error("Error fetching player kills:", killsError)
-        return
-      }
-
-      console.log(`Found ${playerKillsData?.length || 0} player kill records`)
-
-      const targetMatchIds = [21, 22, 23]
-      console.log("Looking for kill data in matches:", targetMatchIds)
-
-      if (playerKillsData) {
-        targetMatchIds.forEach((matchId) => {
-          const killsInMatch = playerKillsData.filter((k) => k.match_id === matchId)
-          console.log(`Match ID ${matchId}: Found ${killsInMatch.length} player kill records`)
-          killsInMatch.forEach((kill) => {
-            console.log(`  - Player ${kill.player_id} got ${kill.kills} kills`)
-          })
-        })
-      }
-
-      // Get all completed matches
-      const { data: completedMatches, error: matchesError } = await supabase
-        .from("matches")
-        .select("id, match_number")
-        .eq("status", "completed")
-        .order("match_number")
-
-      if (matchesError) {
-        console.error("Error fetching completed matches:", matchesError)
-        return
-      }
-
-      const totalCompletedMatches = completedMatches?.length || 0
-      console.log(`Total completed matches: ${totalCompletedMatches}`)
-
-      // Get all players with team information
-      const { data: playersData, error: playersError } = await supabase.from("players").select(`
-        id,
-        player_name,
-        team_id,
-        teams (
-          team_name
-        )
-      `)
-
-      if (playersError) {
-        console.error("Error fetching players:", playersError)
-        return
-      }
-
-      console.log(`Found ${playersData?.length || 0} players`)
-
-      // Create a lookup object for player data
-      const playersLookup: { [key: number]: any } = {}
-      playersData?.forEach((player) => {
-        playersLookup[player.id] = player
-      })
-
-      // Process player statistics
-      const playerStatsLookup: { [key: number]: PlayerStats & { matchIds: Set<number> } } = {}
-
-      // Initialize all players with zero stats
-      playersData?.forEach((player) => {
-        playerStatsLookup[player.id] = {
-          player_id: player.id,
-          player_name: player.player_name,
-          team_name: player.teams?.team_name || "Unknown Team",
-          team_id: player.team_id,
-          total_kills: 0,
-          matches_played: 0,
-          avg_kills: 0,
-          matchIds: new Set<number>(),
-        }
-      })
-
-      playerKillsData?.forEach((killRecord: any) => {
-        const playerId = killRecord.player_id
-        const kills = killRecord.kills || 0
-        const matchId = killRecord.match_id
-
-        const playerInfo = playersLookup[playerId]
-        if (playerInfo) {
-          const existing = playerStatsLookup[playerId]
-          if (existing) {
-            existing.total_kills += kills
-            existing.matchIds.add(matchId)
-
-            if (targetMatchIds.includes(matchId)) {
-              console.log(`✓ Player ${existing.player_name} got ${kills} kills in match ID ${matchId}`)
-            }
-          }
-        }
-      })
-
-      // Debug: Show total kills for top players
-      const topKillers = Object.values(playerStatsLookup)
-        .sort((a, b) => b.total_kills - a.total_kills)
-        .slice(0, 5)
-
-      console.log("Top 5 killers after processing:")
-      topKillers.forEach((player) => {
-        console.log(`${player.player_name}: ${player.total_kills} kills across ${player.matchIds.size} matches`)
-      })
-
-      // Finalize stats with proper match counting
-      const completePlayerStats = Object.values(playerStatsLookup)
-        .map((player) => ({
-          player_id: player.player_id,
-          player_name: player.player_name,
-          team_name: player.team_name,
-          team_id: player.team_id,
-          total_kills: player.total_kills,
-          matches_played: totalCompletedMatches,
-          avg_kills: totalCompletedMatches > 0 ? player.total_kills / totalCompletedMatches : 0,
-        }))
-        .sort((a, b) => b.total_kills - a.total_kills)
-
-      console.log(`Final stats: ${completePlayerStats.length} players with ${totalCompletedMatches} matches each`)
-      console.log("=== END DEBUGGING ===")
-
-      setAllPlayerStats(completePlayerStats)
-      setPlayerStats(completePlayerStats.slice(0, 10))
-    } catch (error) {
-      console.error("Error processing player stats:", error)
-    }
-  }
-
-  const fetchAllMatchDetails = async () => {
-    try {
-      // Get all completed matches
-      const { data: matches, error: matchesError } = await supabase
-        .from("matches")
-        .select(`
-          id,
-          match_number,
-          map_name
-        `)
-        .eq("status", "completed")
-        .order("match_number")
-
-      if (matchesError) {
-        console.log("Matches not available yet:", matchesError.message)
-        return
-      }
-
-      if (!matches || matches.length === 0) {
-        console.log("No completed matches available yet")
-        return
-      }
-
-      // Get all match results
-      const { data: matchResults, error: resultsError } = await supabase.from("match_results").select(`
-        match_id,
-        team_id,
-        placement,
-        total_kills,
-        points
-      `)
-
-      if (resultsError) {
-        console.error("Error fetching match results:", resultsError)
-        return
-      }
-
-      // Get all teams
-      const { data: teamsData, error: teamsError } = await supabase.from("teams").select(`
-        id,
-        team_name
-      `)
-
-      if (teamsError) {
-        console.error("Error fetching teams:", teamsError)
-        return
-      }
-
-      // Create lookup object for teams
-      const teamsLookup: { [key: number]: any } = {}
-      teamsData?.forEach((team) => {
-        teamsLookup[team.id] = team
-      })
-
-      // Process match-wise statistics
-      const allMatchDetails = matches.map((match) => {
-        const matchTeams =
-          matchResults
-            ?.filter((result) => result.match_id === match.id)
-            .map((result) => {
-              const team = teamsLookup[result.team_id]
-              return {
-                team_name: team?.team_name || "Unknown Team",
-                placement: result.placement,
-                kills: result.total_kills,
-                points: result.points,
-              }
-            })
-            .sort((a, b) => a.placement - b.placement) || []
-
-        return {
-          id: match.id,
-          match_number: match.match_number,
-          map_name: match.map_name,
-          teams: matchTeams,
-        }
-      })
-
-      setAllMatches(allMatchDetails)
-      if (allMatchDetails.length > 0 && !selectedMatchIdForStandings) {
-        setSelectedMatchIdForStandings(allMatchDetails[0].id.toString()) // Select the first match by default
-      }
-    } catch (error) {
-      console.error("Error processing match details:", error)
+      console.error("Error fetching stats:", error)
+      setError("Failed to load tournament statistics. Please try again later.")
+    } finally {
+      setLoading(false)
     }
   }
 
